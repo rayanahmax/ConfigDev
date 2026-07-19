@@ -32,10 +32,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js v20
+      - name: Set up Node.js v22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm" # caches ~/.npm between runs for faster installs
 
       - name: Install dependencies
@@ -59,10 +59,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js v20
+      - name: Set up Node.js v22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
       - name: Install dependencies
