@@ -1,0 +1,283 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CronToSystemd from '../components/tools/CronToSystemd';
+import RelatedTools from '../components/shared/RelatedTools.astro';
+
+const toolFaqs = [
+  {
+    question: 'What are the main advantages of systemd timers over classic crontabs?',
+    answer: 'Systemd timers offer vast improvements over standard cron jobs, including real-time monitoring via journalctl, explicit execution dependencies (e.g., waiting for networks or storage mounts to be ready), strict resource limitations using cgroups, and persistent tracking. If a server is powered down when a systemd timer is scheduled, the persistent configuration ensures the job executes immediately upon system recovery rather than failing silently.'
+  },
+  {
+    question: 'How does the systemd OnCalendar configuration map to crontab syntax?',
+    answer: 'While crontab maps five fields sequentially (minute, hour, day of month, month, day of week), systemd uses a declarative OnCalendar format: "DayOfWeek Year-Month-Day Hour:Minute:Second". For instance, a weekly cron string like "0 5 * * 1" becomes "Mon *-*-* 05:00:00" in a systemd unit file, mapping accurately across both scheduling engines.'
+  },
+  {
+    question: 'How do I schedule a systemd timer to execute recurring tasks every 5 minutes?',
+    answer: 'To emulate a repetitive sub-hour cron schedule such as "*/5 * * * *", your systemd timer configuration utilizes the declarative statement "OnCalendar=*:0/5". This informs the system manager engine to activate the linked execution service unit precisely at the five-minute mark within every active hour block.'
+  },
+  {
+    question: 'Is this crontab translation tool safe for confidential production scripts?',
+    answer: 'Yes. ConfigDev executes 100% of its compilation routines locally within your active browser runtime workspace. Because there are no server-side API round-trips, ingestion pipelines, or persistent database layers connected to this layout, your production paths, arguments, and job definitions never risk exposure.'
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://configdev.com/cron-to-systemd-converter",
+      "url": "https://configdev.com/cron-to-systemd-converter",
+      "name": "Crontab to Systemd Converter Online - Free & Secure",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux",
+      "browserRequirements": "Requires JavaScript. Runs entirely client-side inside local browser memory sandbox frameworks.",
+      "description": "A free, browser-based crontab to systemd timer converter. Translate legacy cron schedule expressions into production-ready systemd .service and .timer unit files entirely offline."
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://configdev.com/cron-to-systemd-converter/#faq",
+      "mainEntity": toolFaqs.map(f => ({
+        "@type": "Question",
+        "name": f.question,
+        "acceptedAnswer": { "@type": "Answer", "text": f.answer }
+      }))
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://configdev.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Cron to Systemd Converter", "item": "https://configdev.com/cron-to-systemd-converter" }
+      ]
+    }
+  ]
+};
+---
+
+<Layout
+  title="Crontab to Systemd Converter Online | ConfigDev"
+  description="Convert legacy crontab expressions to systemd .timer unit files offline. Free, 100% client-side—no data uploaded. Generate unit files now."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        All Free Developer Tools
+      </a>
+    </nav>
+
+    <header class="mb-8 pb-8 border-b border-neutral-200">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-neutral-900 tracking-tight mb-3">
+            Crontab to Systemd Converter
+          </h1>
+          <p class="text-base text-neutral-500 max-w-xl leading-relaxed">
+            Free, zero-ingress tool to translate legacy UNIX cron schedule expressions into modern, native systemd service targets and calendar timers with absolute safety.
+          </p>
+        </div>
+
+        <div class="shrink-0 inline-flex items-center gap-2 px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-medium text-neutral-600 whitespace-nowrap self-start" role="status">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true"></span>
+          100% Free &amp; Secure Client-Side Sandbox
+        </div>
+      </div>
+    </header>
+
+    <div class="mb-6 max-w-6xl bg-neutral-50 border border-neutral-200 rounded-lg p-4 flex items-start gap-3">
+      <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v3m0-3h3m-3 0H9m12-3a9 9 0 11-18 0 9 9 0 0118 0zM12 5V3m0 2L9 3m3 2l3-3"></path>
+      </svg>
+      <div class="text-xs text-neutral-600 leading-relaxed">
+        <strong class="text-neutral-900 block mb-0.5">Privacy Assurance Matrix</strong>
+        Your configuration structures are parsed and compiled dynamically within your active browser's isolated sandboxed workspace. No background databases record your automation profiles, and all parameters clear instantly upon frame reset.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <CronToSystemd client:load />
+    </div>
+
+    <div class="mb-16 rounded-lg border-2 border-emerald-400 bg-emerald-50 px-5 py-4 text-center shadow-sm">
+      <p class="text-sm sm:text-base font-bold text-emerald-900 tracking-wide">
+        Verifiable Security — Zero Network Ingress · Open DevTools Network Tab to Confirm
+      </p>
+    </div>
+
+    <section id="how-it-works" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="steps-heading">
+      <h2 id="steps-heading" class="text-lg font-bold text-neutral-900 mb-4">How to Convert Crontab to Systemd Timers</h2>
+      <ol class="space-y-4 list-decimal list-inside text-sm text-neutral-600 leading-relaxed">
+        <li>
+          <strong class="text-neutral-900">Define Target Command:</strong> Input your executable binary path or script command sequence alongside your desired internal token name.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Provide Cron Expression:</strong> Paste your standard 5-segment crontab string (e.g., <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">*/5 * * * *</code> for every 5 minutes).
+        </li>
+        <li>
+          <strong class="text-neutral-900">Deploy Systemd Units:</strong> Instantly extract the generated `.timer` and `.service` unit files, copying them directly to your destination host infrastructure.
+        </li>
+      </ol>
+    </section>
+
+    <section id="cron-vs-systemd" class="max-w-3xl mx-auto mb-16" aria-labelledby="comparison-heading">
+      <h2 id="comparison-heading" class="text-lg font-bold text-neutral-900 mb-4">Systemd Timers vs Cron: Why Modern SREs are Migrating</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          While classical UNIX cron configurations have provided foundational task execution since early server distributions, they lack the granularity, isolated dependencies, and tracking metrics required by modern scale clusters. Reddit threads and GitHub discussions surrounding production infrastructure stability frequently advocate for transitioning legacy configurations to systemd.
+        </p>
+        <p>
+          Unlike a crontab job which launches blindly and captures exit statuses through archaic system mail files, a systemd timer hooks directly into the host initialization supervisor daemon. This lets you enforce prerequisite execution checks, bound tasks to explicit hardware control constraints using Linux cgroups, and read exit status codes natively using <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">journalctl</code> telemetry maps.
+        </p>
+      </div>
+    </section>
+
+    <section id="timer-examples" class="max-w-3xl mx-auto mb-16" aria-labelledby="examples-heading">
+      <h2 id="examples-heading" class="text-lg font-bold text-neutral-900 mb-4">Common Systemd Timer Examples &amp; Syntax</h2>
+      <div class="space-y-4 text-sm text-neutral-600 leading-relaxed">
+        <p>
+          To configure schedules cleanly within the declarative <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">OnCalendar=</code> parameter, it is helpful to look at how specific periodic patterns map onto the system manager layout:
+        </p>
+        <div class="border border-neutral-200 rounded-lg overflow-hidden font-mono text-xs">
+          <div class="grid grid-cols-3 bg-neutral-50 border-b border-neutral-200 p-2.5 font-bold text-neutral-700">
+            <div>Frequency Goal</div>
+            <div>Legacy Crontab</div>
+            <div>Modern Systemd Alternative</div>
+          </div>
+          <div class="grid grid-cols-3 border-b border-neutral-100 p-2.5 bg-white">
+            <div class="font-sans text-neutral-600">Every 5 Minutes</div>
+            <div class="text-amber-700">*/5 * * * *</div>
+            <div class="text-emerald-700">OnCalendar=*:0/5</div>
+          </div>
+          <div class="grid grid-cols-3 border-b border-neutral-100 p-2.5 bg-neutral-50/40">
+            <div class="font-sans text-neutral-600">Every Hour Sharp</div>
+            <div class="text-amber-700">0 * * * *</div>
+            <div class="text-emerald-700">OnCalendar=*-*-* *:00:00</div>
+          </div>
+          <div class="grid grid-cols-3 p-2.5 bg-white">
+            <div class="font-sans text-neutral-600">Daily at Midnight</div>
+            <div class="text-amber-700">0 0 * * *</div>
+            <div class="text-emerald-700">OnCalendar=daily</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="enterprise-stability" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="stability-heading">
+      <h2 id="stability-heading" class="text-lg font-bold text-neutral-900 mb-4">Maintaining Enterprise Fleet Stability</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          Contemporary cluster configurations and immutable infrastructure methodologies require clear visibility across processing branches. Blind scheduling via legacy crontabs introduces hidden failure loops across containers or automated fleet structures, failing silently when prerequisite configurations aren't matched.
+        </p>
+        <p>
+          ConfigDev helps mitigate these operational risks by providing a clean, client-side compilation route to rewrite automation hooks. Moving tasks into systemd's system manager configuration ensures unified error logging via <code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded text-neutral-800">journalctl</code> and allows for explicit system health checks, bringing old infrastructure patterns into alignment with enterprise-grade site reliability engineering (SRE) criteria.
+        </p>
+      </div>
+    </section>
+
+    <section id="tool-faq" class="max-w-3xl mx-auto border-t border-neutral-200 pt-16 pb-12" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" class="text-2xl font-bold text-neutral-900 mb-12">Frequently Asked Questions</h2>
+      
+      <div class="flex flex-col gap-16">
+        
+        <div class="block">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-500 font-mono mb-6 pb-2 border-b border-neutral-200">
+            Timing &amp; Syntax Mappings
+          </h3>
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">How do I convert the timing syntax?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Systemd uses <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">OnCalendar=</code> for calendar-based times. You can test your systemd expressions using <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">systemd-analyze calendar "your expression"</code> before deploying them.<br /><br />
+                • Every hour: <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">0 * * * *</code> becomes <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">OnCalendar=hourly</code><br />
+                • Every day at midnight: <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">0 0 * * *</code> becomes <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">OnCalendar=daily</code><br />
+                • Every Monday at 3:30 AM: <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">30 3 * * 1</code> becomes <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">OnCalendar=Mon *-*-* 03:30:00</code>
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">Where do I save the new unit files?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                For system-wide jobs (root permissions): Place files in <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">/etc/systemd/system/</code>.<br />
+                For user-specific jobs (individual user account): Place files in <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">~/.config/systemd/user/</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="block pt-6">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-500 font-mono mb-6 pb-2 border-b border-neutral-200">
+            Troubleshooting &amp; Environment
+          </h3>
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">Why does my script fail with "command not found" in systemd?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Cron executes scripts in a basic shell environment, but systemd does not spin up a shell at all; it executes binaries directly with a very restricted <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">$PATH</code>.<br /><br />
+                <strong>The fix:</strong> Always use absolute paths for every command inside your script and your service unit file (e.g., use <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">/usr/bin/curl</code> instead of <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">curl</code>). If you must use shell features like pipes (|) or redirects (&gt;), wrap your call like this: <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">ExecStart=/bin/bash -c 'your command | another command'</code>.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">What happens if the server is off when a task is scheduled?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                <strong>Cron:</strong> The job is completely skipped.<br />
+                <strong>Systemd:</strong> If you append <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">Persistent=true</code> inside the <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">[Timer]</code> block, systemd tracks when the job last ran. If it missed a scheduled run while turned off, it catches up and triggers the script immediately after booting up.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="block pt-6">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-500 font-mono mb-6 pb-2 border-b border-neutral-200">
+            Testing &amp; Logging Diagnostics
+          </h3>
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">Can I manually test a task without waiting for the timer?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Yes, this is one of systemd's greatest advantages. You can bypass the timer completely and trigger the underlying script immediately by running:
+              </p>
+              <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto font-mono text-[11px] mt-2">sudo systemctl start mytask.service</pre>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">How do I see the logs for my scheduled task?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                You do not need to redirect output to custom text files. Systemd captures all standard output (stdout) and error logs (stderr) automatically. View them using:
+              </p>
+              <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto font-mono text-[11px] mt-2">journalctl -u mytask.service</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="block pt-6 border-t border-neutral-200">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-500 font-mono mb-6 pb-2 border-b border-neutral-200">
+            Technical Architecture &amp; Migration FAQ
+          </h3>
+          <div class="space-y-6">
+            {toolFaqs.map((faq, index) => (
+              <div key={index}>
+                <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">{faq.question}</h4>
+                <p class="text-xs text-neutral-500 leading-relaxed text-justify">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <RelatedTools tools={[
+      { href: '/cidr-subnet-calculator', title: 'CIDR Subnet Calculator', description: 'Compute subnet boundaries, usable host ranges, and broadcast addresses for any IPv4 block.', icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9' },
+      { href: '/env-to-json', title: 'Env to JSON Converter', description: 'Parse standard .env files into clean, structured JSON objects ready for any pipeline.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
+      { href: '/pii-masker-log-scrubber', title: 'PII Masker & Log Scrubber', description: 'Redact emails, secrets, tokens, and IPs from raw system dumps and server logs locally.', icon: 'M12 15v2m0 0v3m0-3h3m-3 0H9m12-3a9 9 0 11-18 0 9 9 0 0118 0zM12 5V3m0 2L9 3m3 2l3-3' },
+    ]} />
+
+  </main>
+</Layout>

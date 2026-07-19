@@ -1,0 +1,309 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CsvToSchema from '../components/tools/CsvToSchema';
+import RelatedTools from '../components/shared/RelatedTools.astro';
+
+const toolFaqs = [
+  {
+    question: "What is JSON Schema Draft-07?",
+    answer: "JSON Schema Draft-07 is a vocabulary for annotating and validating JSON documents. It allows you to define the expected structure, types, required fields, and constraints of your JSON data. Draft-07 is one of the most widely supported versions, compatible with validators in Python, JavaScript, Go, and more."
+  },
+  {
+    question: "How does the CSV to JSON Schema builder infer data types?",
+    answer: "The builder scans all values in each column and uses heuristics to determine the most appropriate type: numbers become 'number' or 'integer', true/false values become 'boolean', ISO date strings become 'string' with a 'date-time' format, and all other values become 'string'. If a column contains mixed types, it defaults to 'string'."
+  },
+  {
+    question: "Is my CSV data sent to any server?",
+    answer: "No. The entire parsing and schema generation process runs inside your browser's local JavaScript sandbox (V8 engine). Your CSV data never leaves your machine, making this tool safe for use with confidential datasets, internal business records, or personally identifiable information."
+  },
+  {
+    question: "Can I use this schema with popular validation libraries?",
+    answer: "Yes. The generated JSON Schema Draft-07 output is compatible with AJV (JavaScript), jsonschema (Python), gojsonschema (Go), and any other Draft-07-compliant validator. You can copy the output directly into your project's validation pipeline."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://configdev.com/csv-to-json-schema",
+      "url": "https://configdev.com/csv-to-json-schema",
+      "name": "CSV to JSON Schema Builder Online Free - ConfigDev",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript engine execution capabilities.",
+      "description": "An online free CSV to JSON schema builder designed to parse spreadsheet columns, infer matrix data types, support manual validation overrides, and export valid specification files client-side."
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://configdev.com/csv-to-json-schema/#faq",
+      "mainEntity": toolFaqs.map(f => ({
+        "@type": "Question",
+        "name": f.question,
+        "acceptedAnswer": { "@type": "Answer", "text": f.answer }
+      }))
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://configdev.com/" },
+        { "@type": "ListItem", "position": 2, "name": "CSV to JSON Schema Builder", "item": "https://configdev.com/csv-to-json-schema" }
+      ]
+    }
+  ]
+};
+---
+
+<Layout
+  title="CSV to JSON Schema Builder - Draft-07 Free | ConfigDev"
+  description="Generate JSON Schema Draft-07 from any CSV—auto-infers types, nullable fields, and required constraints. Free, 100% client-side. Build schema now."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    {/* Breadcrumb back navigation */}
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        All Free Developer Tools
+      </a>
+    </nav>
+
+    {/* Header Structure Layout */}
+    <header class="mb-8 pb-8 border-b border-neutral-200">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-neutral-900 tracking-tight mb-3">
+            CSV to JSON Schema Builder Online Free
+          </h1>
+          <p class="text-base text-neutral-500 max-w-xl leading-relaxed">
+            The definitive developer sandbox for deep matrix evaluation of raw spreadsheet columns — with structural field type widening across the full dataset and zero-network tracking overhead.
+          </p>
+        </div>
+
+        <div class="shrink-0 inline-flex items-center gap-2 px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-medium text-neutral-600 whitespace-nowrap self-start" role="status">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true"></span>
+          Secure JavaScript Parser Active
+        </div>
+      </div>
+    </header>
+
+    {/* Interactive Workspace Component */}
+    <div class="mb-12">
+      <CsvToSchema client:load />
+    </div>
+
+    {/* Trust Validation Vector Banner */}
+    <div class="mb-12 rounded-lg border-2 border-emerald-400 bg-emerald-50 px-5 py-4 text-center shadow-xs">
+      <p class="text-sm sm:text-base font-bold text-emerald-900 tracking-wide">
+        Verifiable Security — Zero Network Overhead · Open DevTools Network Tab to Confirm
+      </p>
+    </div>
+
+    {/* Walkthrough Instructions Stack */}
+    <section id="tool-walkthrough" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="walkthrough-heading">
+      <h2 id="walkthrough-heading" class="text-lg font-bold text-neutral-900 mb-4">How to Use the Free CSV to JSON Schema Builder Online</h2>
+      <ol class="space-y-4 list-decimal list-inside text-sm text-neutral-600 leading-relaxed">
+        <li>
+          <strong class="text-neutral-900">Insert Spreadsheet Records:</strong> Paste your comma-separated text blocks or upload a flat file to seed the full dataset matrix for analysis.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Review the Dynamically Inferred Column Meta Matrix:</strong> Inspect each column's widened type, nullability flag, and inferred constraints in the interactive override panel before generating the schema.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Extract Your Valid Specification:</strong> Copy the formatted object tree out of the dark output module to integrate your clean criteria downstream.
+        </li>
+      </ol>
+    </section>
+    
+    {/* Advanced Core Logic Feature Explanations */}
+    <section id="understanding-logic" class="max-w-3xl mx-auto mb-16" aria-labelledby="logic-heading">
+      <h2 id="logic-heading" class="text-lg font-bold text-neutral-900 mb-6">Deep-Dive Data Validation Routines</h2>
+      <div class="space-y-8">
+        
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">1. Full Column Matrix Type Evaluation</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            By applying deterministic pattern matches across every cell in every column — not just the first row — our engine performs a true deep matrix scan. Each cell is classified independently, and the column type widens progressively whenever a more general type is encountered, keeping inference accurate across mixed or sparse datasets.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">2. Granular Required Constraint Compilations</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            Running structural workflows directly inside your client interface ensures extraction latency stays at flat zero. Columns that contain even a single empty cell are flagged as nullable and excluded from the <code class="bg-neutral-100 px-1 rounded text-[11px] font-mono">required</code> array, giving you granular, data-driven required constraints rather than blanket assumptions.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">3. Manual Interactive Configuration Toggles</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            Using a robust CSV to JSON converter online free utility to isolate system anomalies is standard practice for DevOps setups. Each inferred column type can be overridden via the interactive toggle panel — letting you promote an integer to string or demote a float to integer before the final schema is compiled.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    {/* Target Slicing Code Sandbox Visual Reference */}
+    <section id="syntax-mapping" class="max-w-3xl mx-auto mb-16" aria-labelledby="syntax-heading">
+      <h2 id="syntax-heading" class="text-xs font-bold uppercase tracking-wider text-neutral-400 font-mono mb-4">Target Schema Definition Mapping</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-50 border border-neutral-200 rounded-xl p-5 font-mono text-xs text-neutral-700">
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Raw CSV Data Structure Input</div>
+          <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto">item_id,on_grid,weight_kg
+"unit_alpha",true,12.4</pre>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Auto-Generated Manifest Structure</div>
+          <pre class="bg-neutral-900 text-emerald-400 p-3 rounded-lg overflow-x-auto">"properties": &#123;
+  "item_id": &#123; "type": "string" &#125;,
+  "on_grid": &#123; "type": "boolean" &#125;,
+  "weight_kg": &#123; "type": "number" &#125;
+&#125;</pre>
+        </div>
+      </div>
+    </section>
+
+    {/* Cross-Language Programmatic Implementations */}
+    <section id="programmatic-alternatives" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="prog-heading">
+      <h2 id="prog-heading" class="text-lg font-bold text-neutral-900 mb-4">Programmatic Schema Inference Formats</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          If you want to integrate data structures directly into ingestion architectures, server pipelines, or system automated testing suites instead of parsing inputs manually, you can configure these native open-source library structures:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">CSV to JSON Schema Builder Python Setup</h3>
+            <p class="text-xs text-neutral-500 mb-3">
+              For back-end data pipelines and data ingestion scripts, leverage the open-source `genson` package along with native CSV parsing tools to generate models.
+            </p>
+            <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto"># Using GenSon library for type loops
+from genson import SchemaBuilder
+builder = SchemaBuilder()</pre>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">JavaScript Streaming Processing</h3>
+            <p class="text-xs text-neutral-500 mb-3">
+              When configuring Node.js backend microservices or proxy routing components, combine stream parsing tools to safely convert attributes.
+            </p>
+            <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto">// Use PapaParse or csv-parser 
+import csv from 'csv-parser';</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* SRE Compliance Architecture Framing Block */}
+    <section id="site-reliability" class="max-w-3xl mx-auto mb-16" aria-labelledby="sre-heading">
+      <h2 id="sre-heading" class="text-lg font-bold text-neutral-900 mb-4">Maintaining Compliance in Site Reliability Engineering</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          Contemporary audit criteria—such as GDPR protocols, HIPAA regulations, and SOC2 profiles—require careful handling of application traces, database diagnostic schemas, and configuration variables. Passing raw spreadsheets through opaque third-party web backends exposes sensitive internal keys to logging risks and data leaks.
+        </p>
+        <p>
+          ConfigDev blocks these external data leakage points directly at the origin boundary. Processing files fully client-side inside the browser engine enables secure, automated data structure generation while remaining fully compliant with corporate data protection standards.
+        </p>
+      </div>
+    </section>
+
+    {/* Structured FAQ Matrix Component */}
+    <section id="tool-faq" class="max-w-3xl mx-auto border-t border-neutral-200 pt-16 pb-12" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" class="text-2xl font-bold text-neutral-900 mb-12">Frequently Asked Questions</h2>
+      
+      {/* Container spacing layout configuration */}
+      <div class="flex flex-col gap-16">
+        
+        {/* CATEGORY BLOCK 1 */}
+        <div class="block">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-500 font-mono mb-6 pb-2 border-b border-neutral-200">
+            General Questions
+          </h3>
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">What is the difference between converting to JSON and building a JSON Schema?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Converting a CSV turns the rows and data into an array of JSON objects (e.g., <code class="bg-neutral-100 px-1 py-0.5 rounded text-[11px] font-mono">[&#123;"Name": "John", "Age": 25&#125;]</code>). Building a JSON Schema defines the structure of those objects—such as specifying that "Name" is a string, "Age" is an integer with a minimum value of 18, and both are required fields.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">How does the builder determine data types?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Most builders use type inference. They scan the column values and guess if the data is a string, number, boolean, or null.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">Does the builder support custom delimiters?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Yes. High-quality tools allow you to specify whether your file uses a comma (,), semicolon (;), tab, or pipe (|), as well as how quote characters are handled.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* CATEGORY BLOCK 2 */}
+        <div class="block pt-6">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-500 font-mono mb-6 pb-2 border-b border-neutral-200">
+            Troubleshooting &amp; Best Practices
+          </h3>
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">Why are my numbers turning into strings?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                If your data types aren't inferring correctly, look for a Parse Numbers or Type Inference setting in the tool you are using and make sure it is enabled.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">How do I handle header rows?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                If your CSV's first row contains column names, ensure the Header Row or First Row is Headers setting is checked. If unchecked, the tool treats the first row as raw data and generates array indices or generic headers.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">Why does the builder freeze on large files?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Large files can overwhelm browser-based tools. Look for dedicated parsing platforms or local desktop apps (like Docparser for bulk jobs) that use background threads or server-side processing to handle larger datasets.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* CATEGORY BLOCK 3 */}
+        <div class="block pt-6">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-500 font-mono mb-6 pb-2 border-b border-neutral-200">
+            Usage &amp; Implementation
+          </h3>
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">Can I use this as a data contract?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                Absolutely. Once generated, a JSON schema acts as a machine-readable data contract. You can validate incoming CSVs against this schema using tools like CSVlint or custom code to catch data entry errors before they hit your pipelines.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">What if I need to do this programmatically?</h4>
+              <p class="text-xs text-neutral-500 leading-relaxed text-justify">
+                You don't need a UI. You can build schemas or convert files programmatically using libraries like csvtojson in JavaScript/Node.js or csv packages in Python.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <RelatedTools tools={[
+      { href: '/env-to-json', title: 'Env to JSON Converter', description: 'Parse standard .env files into clean, structured JSON objects ready for any pipeline.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
+      { href: '/pii-masker-log-scrubber', title: 'PII Masker & Log Scrubber', description: 'Redact emails, secrets, tokens, and IPs from raw system dumps and server logs locally.', icon: 'M12 15v2m0 0v3m0-3h3m-3 0H9m12-3a9 9 0 11-18 0 9 9 0 0118 0zM12 5V3m0 2L9 3m3 2l3-3' },
+      { href: '/json-to-env', title: 'JSON to Env Converter', description: 'Flatten nested JSON objects into standard flat .env key-value lines with configurable delimiters.', icon: 'M6 16l-4-4 4-4M18 8l4 4-4 4' },
+    ]} />
+
+  </main>
+</Layout>

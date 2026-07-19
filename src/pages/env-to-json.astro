@@ -1,0 +1,280 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EnvToJson from '../components/tools/EnvToJson';
+import RelatedTools from '../components/shared/RelatedTools.astro';
+
+const pageFaqs = [
+  {
+    q: "Is it safe to paste production .env files or secret keys into this online converter?",
+    a: "Absolutely. This tool operates under a zero-ingress network model. The parsing engine runs entirely inside your browser's local sandbox memory (V8 execution thread). No text payloads are transmitted across network sockets, making it completely secure for opening your ENV files online and handling sensitive private keys, API secrets, or cryptographic certificates."
+  },
+  {
+    q: "Why should I convert a .env file into a structured JSON object?",
+    a: "While flat .env files work well for basic key-value pairs, modern runtimes like Node.js, Cloudflare Workers, and multi-tenant Docker systems rely heavily on nested objects or arrays. Transitioning your variables to a JSON payload simplifies application bootstrapping and handles high-volume structural matrices far more efficiently."
+  },
+  {
+    q: "Can I use this page as a TXT to ENV converter or to parse document configurations?",
+    a: "Yes. Because environment configurations are simply plaintext rows, you can copy text blocks out of raw .txt file backups or layout text from a PDF, drop them into the input pane, and use this tool to validate, clean, and create an env file online instantly."
+  },
+  {
+    q: "How does the converter handle inline or block comments (#)?",
+    a: "The tool filters lines starting with '#' completely. For inline comments trailing an assignment (e.g., API_KEY=xyz # production key), the parser cleanly strips the comment syntax while completely preserving your target configuration parameters."
+  },
+  {
+    q: "Can this tool parse system environment syntax like variable substitution?",
+    a: "Yes. The parsing logic actively parses complex configurations, handling multi-line double-quoted tokens and managing standard dot or double-underscore syntax variables to keep structural hierarchies aligned when mapping downstream object layers."
+  },
+  {
+    q: "Why should I convert .env files to JSON?",
+    a: "JSON is universally readable and highly structured. Converting is useful when migrating configuration settings for documentation, validation routines, or building dynamic configuration pipelines (like with Azure App Settings or Docker)."
+  },
+  {
+    q: "Are online converters and viewers safe to use with my secret keys?",
+    a: "It depends. For public or non-sensitive configuration keys, web-based viewers and converters are perfectly fine. However, if your .env file contains production passwords, API keys, or JWT secrets, it is highly recommended to use local tools (like command-line parsers or local IDE extensions) to avoid exposing sensitive data to third-party web servers."
+  },
+  {
+    q: "Do these tools support complex .env features?",
+    a: "High-quality online converters can handle standard quotes, blank lines, and in-line comments. However, tools differ on how they parse complex features like multi-line strings, variable substitution (e.g., PORT=$HOST_PORT), or deep JSON nesting, so you may need to sanitize your files beforehand."
+  },
+  {
+    q: "Can I convert JSON back into a .env file?",
+    a: "Yes. Many online tools offer a two-way conversion. If you need a web-based solution for this, you can use the Matiboux Env Converter or the Formatter.org .env Converter to switch between formats and output clean, spaced configuration files."
+  },
+  {
+    q: "How can I format my .env files internally without a web app?",
+    a: "If you want to standardise, read, and clean your files locally on your development machine, you can utilize the Encode64 .env Formatter which allows for space cleanup and comment preservation without risking your secrets."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://configdev.com/env-to-json",
+      "url": "https://configdev.com/env-to-json",
+      "name": "Env to JSON Converter Online - Free ENV Viewer",
+      "applicationCategory": "DeveloperApplication",
+      "browserRequirements": "Requires JavaScript. Runs entirely client-side inside local browser memory sandbox frameworks.",
+      "description": "Free online env file viewer and environment configuration builder. Instantly open, view, and safely parse standard .env or plaintext .txt configurations into structured, nested JSON objects 100% client-side."
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://configdev.com/env-to-json/#faq",
+      "mainEntity": pageFaqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://configdev.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Env to JSON Converter", "item": "https://configdev.com/env-to-json" }
+      ]
+    }
+  ]
+};
+---
+
+<Layout
+  title="Env to JSON Converter - Free .env Parser | ConfigDev"
+  description="Parse .env files into structured JSON with type-casting, nested key expansion, and comment stripping. Free, 100% client-side—no server upload. Try it now."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        All Free Developer Tools
+      </a>
+    </nav>
+
+    <header class="mb-8 pb-8 border-b border-neutral-200">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-neutral-900 tracking-tight mb-3">
+            Env to JSON Converter &amp; Online ENV Viewer
+          </h1>
+          <p class="text-base text-neutral-500 max-w-xl leading-relaxed">
+            Instantly open, view, and parse standard <code class="px-1.5 py-0.5 bg-neutral-100 rounded text-sm font-mono text-neutral-700">.env</code> configurations or plain <code class="px-1.5 py-0.5 bg-neutral-100 rounded text-sm font-mono text-neutral-700 text-neutral-800">.txt</code> files into structured JSON configurations safely. 
+          </p>
+        </div>
+
+        <div class="shrink-0 inline-flex items-center gap-2 px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-medium text-neutral-600 whitespace-nowrap self-start" role="status">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true"></span>
+          100% Secure Client-Side Sandbox
+        </div>
+      </div>
+    </header>
+
+    <div class="mb-6 max-w-6xl bg-neutral-50 border border-neutral-200 rounded-lg p-4 flex items-start gap-3">
+      <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v3m0-3h3m-3 0H9m12-3a9 9 0 11-18 0 9 9 0 0118 0zM12 5V3m0 2L9 3m3 2l3-3"></path>
+      </svg>
+      <div class="text-xs text-neutral-600 leading-relaxed">
+        <strong class="text-neutral-900 block mb-0.5">Privacy Assurance Matrix</strong>
+        Your configuration strings are processed instantly entirely within local browser sandboxed memory space. No network ingress handles your data, and all states are wiped completely from active system threads the moment you close or refresh this tab.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <EnvToJson client:load />
+    </div>
+
+    <div class="mb-16 rounded-lg border-2 border-emerald-400 bg-emerald-50 px-5 py-4 text-center shadow-sm">
+      <p class="text-sm sm:text-base font-bold text-emerald-900 tracking-wide">
+        Verifiable Security — Zero Network Overhead · Open DevTools Network Tab to Confirm
+      </p>
+    </div>
+
+    <section id="how-it-works" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="steps-heading">
+      <h2 id="steps-heading" class="text-lg font-bold text-neutral-900 mb-4">How to Use the Online ENV Viewer &amp; Converter</h2>
+      <ol class="space-y-4 list-decimal list-inside text-sm text-neutral-600 leading-relaxed">
+        <li>
+          <strong class="text-neutral-900">Paste Configuration or Load Files:</strong> Copy and drop environment rows directly from your local project files, raw <code class="px-1 bg-neutral-50 rounded text-neutral-800 font-mono">.txt</code> documents, or text contents copied from a configuration PDF sheet.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Configure Transformation Rules:</strong> Fine-tune parameters using tool engine modifiers including <span class="italic font-medium text-neutral-800">Normalize Keys</span>, <span class="italic font-medium text-neutral-800">Cast Data Types</span>, or <span class="italic font-medium text-neutral-800">Collapse Nested Paths</span>.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Extract Clean JSON Payload:</strong> Instantly copy the validated, structural JSON output schema tree, or invert the tool to easily create an env file online.
+        </li>
+      </ol>
+    </section>
+
+    <section id="advanced-features" class="max-w-3xl mx-auto mb-16" aria-labelledby="advanced-heading">
+      <h2 id="advanced-heading" class="text-lg font-bold text-neutral-900 mb-6">Understanding Parsing Engine Customizations</h2>
+      <div class="space-y-8">
+        
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">1. Normalize Keys</h3>
+          <p class="text-sm text-neutral-600 mb-3 leading-relaxed">
+            Standard environment variables traditionally use capitalized shouting snake_case syntax (<code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded">API_KEY</code>). Enabling key normalization transforms raw strings into uniform, lowercased indices. This prevents typical runtime parsing case-sensitivity errors when piping configuration hashes dynamically into front-end application architectures or container deployment systems.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">2. Cast Data Types (Type Casting Primitives)</h3>
+          <p class="text-sm text-neutral-600 mb-3 leading-relaxed">
+            By definition, <code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded">.env</code> engines ingest all right-hand expressions as raw text blocks. Consequently, setting flags like <code class="font-mono text-xs">IS_PRODUCTION=false</code> yields a literal string representation that computes as truthy within standard JavaScript runtime flows. When Type Casting is toggled, values matching common Boolean patterns, clear whole integers, decimal floating-point representations, or explicit null declarations automatically morph into strict JSON primitives.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">3. Collapse Nested Paths (Nested Expansion)</h3>
+          <p class="text-sm text-neutral-600 mb-3 leading-relaxed">
+            Managing clean separation profiles within high-volume config properties typically forces architects to emulate directory depths using explicit characters like structural dot notations or double underscores (<code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded">DB__PORT</code>). Toggling nested path collapsing informs our V8 string parser matrix to split keys at matching bounds and generate complex, multi-tiered structural branches instead of processing one single flat dictionary list.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="conversion-example" class="max-w-3xl mx-auto mb-16" aria-labelledby="example-heading">
+      <h2 id="example-heading" class="text-xs font-bold uppercase tracking-wider text-neutral-400 font-mono mb-4">Target Conversion Syntax Mapping</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-50 border border-neutral-200 rounded-xl p-5 font-mono text-xs text-neutral-700">
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Raw .env Input</div>
+          <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto">DB__HOST=127.0.0.1
+DB__PORT=3306
+TRACK_METRICS=false</pre>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Output (All Options Active)</div>
+          <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto">{"{"}
+  "db": {"{"}
+    "host": "127.0.0.1",
+    "port": 3306
+  {"}"},
+  "track_metrics": false
+{"}"}</pre>
+        </div>
+      </div>
+    </section>
+
+    {/* Programmatic Alternative Solutions & Open Source Ecosystem */}
+    <section id="programmatic-alternatives" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="programmatic-heading">
+      <h2 id="programmatic-heading" class="text-lg font-bold text-neutral-900 mb-4">Programmatic Configuration Alternative Engines</h2>
+      <div class="text-sm text-neutral-600 space-y-6 leading-relaxed">
+        <p>
+          If you are building complex open-source infrastructure configurations on platforms like GitHub or orchestrating automated delivery environments inside a CI/CD pipeline, you may want to utilize standalone language parsing modules instead of an online web utility.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Env to JSON Online Python Engine</h3>
+            <p class="text-xs text-neutral-500 mb-3">
+              For automation, devops configuration models, and machine learning structures, the open-source <code class="font-mono text-[11px] bg-neutral-900 text-neutral-200 px-1 rounded">python-dotenv</code> module lets you parse attributes smoothly into structured dictionaries.
+            </p>
+            <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto">from dotenv import dotenv_values\nimport json\nconfig = dotenv_values(".env")\njson_output = json.dumps(config)</pre>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Env to JSON Online Java Infrastructure</h3>
+            <p class="text-xs text-neutral-500 mb-3">
+              In modular enterprise frameworks, the popular <code class="font-mono text-[11px] bg-neutral-900 text-neutral-200 px-1 rounded">dotenv-java</code> library targets flat properties files and provides programmatic bindings to access runtime objects easily.
+            </p>
+            <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto">Dotenv dotenv = Dotenv.load();\nString dbUser = dotenv.get("DB_USER");</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="technical-context" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="context-heading">
+      <h2 id="context-heading" class="text-lg font-bold text-neutral-900 mb-4">Migrating Environment Settings to Config Objects</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          Managing software systems across modern microservices architectures requires clean, structured application variables. Traditional <code class="px-1 bg-neutral-50 rounded text-neutral-800 font-mono">.env</code> configurations are designed as simple shell strings assigning flat key-value pairs. However, modern Node.js, Python, Cloudflare Workers, or Go runtimes handle nested objects or array indices significantly better when working with high-volume deployment tasks or nested configuration payloads.
+        </p>
+        <p>
+          ConfigDev provides an automated solution by converting unstructured file environments into perfectly parsed JSON key objects entirely in browser thread memory space. This client-side sandbox design prevents developers from uploading sensitive operational databases or private configuration keys to external APIs. By mapping fields locally, corporate structures maintain absolute alignment with modern data protection standards.
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="features-heading">
+      <h2 id="features-heading" class="text-xs font-bold uppercase tracking-wider text-neutral-400 font-mono mb-6">Parser Capabilities</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+        {[
+          { title: 'Comment Stripping', description: 'Lines beginning with # and inline trailing comments are silently discarded before parsing begins.' },
+          { title: 'Multiline Values', description: 'Double-quoted values spanning multiple lines are correctly joined into a single string representation.' },
+          { title: 'Type Casting Primitives', description: 'When enabled, boolean strings, numeric values, and null literals are emitted as their native JSON primitives.' },
+          { title: 'Key Normalisation', description: 'Converts environment variable keys using nested rules for consistent downstream access.' },
+          { title: 'Nested Path Expansion', description: 'Dot and double-underscore notations like DB__HOST are recursively expanded into structured nested objects.' },
+          { title: 'Zero Network Ingress', description: 'All parsing executes strictly within your browser V8 engine. No data is transmitted over any network interface.' }
+        ].map((feat) => (
+          <article class="flex flex-col gap-1">
+            <h3 class="text-sm font-bold text-neutral-900">{feat.title}</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed">{feat.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section id="tool-faq" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 pb-12" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" class="text-lg font-bold text-neutral-900 mb-6">Conversion Technical FAQs</h2>
+      <div class="space-y-6">
+        {pageFaqs.map((faq) => (
+          <div class="border-b border-neutral-100 pb-5 last:border-0 last:pb-0">
+            <h3 class="font-bold text-neutral-800 mb-1.5 text-sm">{faq.q}</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed text-justify">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <RelatedTools tools={[
+      { href: '/json-to-env', title: 'JSON to Env Converter', description: 'Flatten nested JSON trees into flat .env key-value lines with configurable delimiters.', icon: 'M6 16l-4-4 4-4M18 8l4 4-4 4' },
+      { href: '/pii-masker-log-scrubber', title: 'PII Masker & Log Scrubber', description: 'Redact emails, secrets, tokens, and IPs from raw system dumps and server logs locally.', icon: 'M12 15v2m0 0v3m0-3h3m-3 0H9m12-3a9 9 0 11-18 0 9 9 0 0118 0zM12 5V3m0 2L9 3m3 2l3-3' },
+      { href: '/csv-to-json-schema', title: 'CSV to JSON Schema Builder', description: 'Inspect CSV column structures and auto-generate a valid JSON Schema Draft-07 file.', icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582 4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4' },
+    ]} />
+
+  </main>
+</Layout>

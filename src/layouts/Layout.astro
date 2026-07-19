@@ -1,0 +1,149 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  canonicalUrl?: string;
+  noIndex?: boolean; // Added control mechanism for runtime indexing exclusion tags
+}
+
+const {
+  title,
+  description = "Modern, client-side developer utilities for DevOps and backend engineers. Zero-latency, privacy-first tools for cron conversion, PII masking, CIDR subnetting, and more.",
+  noIndex = false,
+} = Astro.props;
+
+const GA_ID = import.meta.env.PUBLIC_GA_ID;
+const YANDEX_VERIFICATION = import.meta.env.PUBLIC_YANDEX_VERIFICATION;
+
+// Sanitizes the pathname against both trailing `index.html` artifacts (from static
+// build outputs that Googlebot has already crawled) and trailing slashes from deep
+// routes before constructing the canonical URL. Root "/" is intentionally left intact.
+// Step 1: Strip any trailing `index.html` emitted by Astro's static build output.
+// Step 2: Strip trailing slashes from deep paths (e.g. /about-us/ → /about-us).
+// This ensures Google Search Console resolves a single authoritative URL per page,
+// eliminating the "Crawled - currently not indexed" duplicate-content conflict.
+const rawPathname = Astro.url.pathname;
+// Step 1: Strip trailing `index.html` from static build output (e.g. /index.html → /)
+// Step 2: Strip `.html` extension emitted by build.format='file' (e.g. /about-us.html → /about-us)
+// Step 3: Strip trailing slashes from deep paths (e.g. /about-us/ → /about-us)
+// Root "/" is intentionally left intact throughout.
+let cleanPath = rawPathname
+  .replace(/index\.html$/, '')      // /index.html → /
+  .replace(/\.html$/, '');          // /page.html  → /page
+const normalizedPathname =
+  cleanPath.length > 1 && cleanPath.endsWith('/')
+    ? cleanPath.slice(0, -1)
+    : cleanPath;
+const canonicalUrl =
+  Astro.props.canonicalUrl ??
+  new URL(normalizedPathname, Astro.site).toString();
+import '../styles/global.css';
+import Navbar from '../components/shared/Navbar.astro';
+import Footer from '../components/shared/Footer.astro';
+
+// Global Platform Schema Core Framework
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "ConfigDev",
+  "url": "https://configdev.com",
+  "description": "Zero-latency, privacy-first secure local sandbox tools for developers."
+};
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Google tag (gtag.js) -->
+    {GA_ID && (
+      <>
+        <script async is:inline src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+        <script is:inline set:html={`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_ID}');
+        `} />
+      </>
+    )}
+
+    {YANDEX_VERIFICATION && (
+      <meta name="yandex-verification" content={YANDEX_VERIFICATION} />
+    )}
+
+    {noIndex ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    )}
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="configdev" />
+    <meta property="og:image" content="https://configdev.com/og-banner.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="https://configdev.com/og-banner.png" />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <link rel="apple-touch-icon" href="/icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Non-render-blocking font load: print media loads async, onload swaps to all -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)}></script>
+  </head>
+  <body class="bg-white text-neutral-900 antialiased selection:bg-amber-500/30 selection:text-neutral-900 min-h-screen flex flex-col">
+    <Navbar />
+
+    <div class="w-full flex-grow flex flex-col items-center">
+      <slot />
+    </div>
+
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  code, pre, kbd, .font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+</style>

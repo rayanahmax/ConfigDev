@@ -1,0 +1,419 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const toolsConfig = [
+  {
+    href: '/cron-to-systemd-converter',
+    title: 'Crontab to Systemd Converter',
+    description: 'Translate legacy cron schedule expressions into production-ready systemd .service and .timer unit files.',
+    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+  },
+  {
+    href: '/env-to-json',
+    title: 'Env to JSON Converter',
+    description: 'Parse standard key-value .env assignment files into clean, formatted JSON objects ready for use in any pipeline.',
+    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>`
+  },
+  {
+    href: '/json-to-env',
+    title: 'JSON to Env Converter',
+    description: 'Flatten nested JSON objects into standard flat .env key-value lines with configurable delimiters and uppercase key formatting.',
+    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6 16l-4-4 4-4M18 8l4 4-4 4"></path></svg>`
+  }
+];
+
+const toolsPrivacy = [
+  {
+    href: '/pii-masker-log-scrubber',
+    title: 'PII Masker & Log Scrubber',
+    description: 'Surgically redact emails, secrets, tokens, and IP strings out of raw system dumps and server logs locally.',
+    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 15v2m0 0v3m0-3h3m-3 0H9m12-3a9 9 0 11-18 0 9 9 0 0118 0zM12 5V3m0 2L9 3m3 2l3-3"></path></svg>`
+  }
+];
+
+const toolsNetwork = [
+  {
+    href: '/cidr-subnet-calculator',
+    title: 'CIDR Subnet Calculator',
+    description: 'Compute subnet boundaries, usable host ranges, broadcast addresses, and network masks for any IPv4 block.',
+    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>`
+  },
+  {
+    href: '/csv-to-json-schema',
+    title: 'CSV to JSON Schema Builder',
+    description: 'Inspect CSV column structures and automatically generate a valid JSON Schema Draft-07 specification file.',
+    icon: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>`
+  }
+];
+
+const allTools = [...toolsConfig, ...toolsPrivacy, ...toolsNetwork];
+
+const faqs = [
+  {
+    question: 'Why should I convert crontabs to native systemd timers?',
+    answer: 'Systemd timers provide comprehensive architectural advantages over traditional crontabs, including explicit dependency management, native boot-sequence tracking, and robust error trapping. Unlike legacy cron jobs, which operate silently and require complex external email setups for standard error redirection, systemd timer events output execution data directly to the central journalctl system log. Additionally, the inclusion of persistence parameters guarantees that if a server host drops or reboots during a critical scheduled window, the missed execution triggers immediately upon environment recovery.'
+  },
+  {
+    question: 'How does a client-side PII masker guarantee absolute data privacy?',
+    answer: "Standard data scrubbers transfer log files to backend servers, creating an active intercept point for sensitive variables. ConfigDev's PII Masker processes input streams strictly in active browser thread memory space using local deterministic tokenization regex rules. Because the host Astro structure uses zero remote ingestion routes, your logs never cross a network interface. This completely blocks the possibility of data leakage, man-in-the-middle attacks, or persistent storage exposure on an external server asset."
+  },
+  {
+    question: 'What makes a /26 CIDR block different from a standard /24 network?',
+    answer: 'A standard Classless Inter-Domain Routing /24 prefix maps a single contiguous network allocation of 256 total IP addresses, yielding exactly 254 usable host addresses after dedicating boundary coordinates for the network identifier and the broadcast route. Conversely, a deeper /26 boundary mask shifts the subnetting bit matrix downward, segmenting that identical 256-address block into four completely isolated, distinct subnets containing 64 total addresses each. After deducting the required boundary IDs for each sub-allocation pool, each individual subnet yields exactly 62 usable host nodes.'
+  },
+  {
+    question: 'How does a local schema builder infer structured rules from raw CSV headers?',
+    answer: 'The transformation matrix inspects the tabular rows of uploaded or pasted text data, analyzing fields on an iterative token scale. Instead of merely scanning column names, the local engine checks cell properties against explicit primitives to deduce if a field represents a strict continuous sequence (integer), a fractional float (number), a state flag (boolean), or a standardized calendar format (date string). It then compiles these rulesets into a valid JSON Schema Draft-07 format, creating structural constraints ready for downstream API request validations.'
+  },
+  {
+    question: 'Can I use these developers tools completely offline?',
+    answer: 'Yes. Because ConfigDev utilities are designed with zero backend network overhead, once the static files load inside your browser sandbox thread, all script assets run independent of network signals. You can securely format .env parameters, compile systemd configuration targets, or scrub production diagnostic files completely severed from the internet.'
+  },
+  {
+    question: 'How does the JSON to Env converter handle deeply nested keys?',
+    answer: 'The structural mapping library recursively walks multi-layered JSON trees and flattens them using a standardized delimiter convention (such as double underscores, e.g., DATABASE__REPLICA__PORT). This ensures structured JSON architecture maps flawlessly back to clean flat configuration rows readable by basic standard system shells.'
+  }
+];
+
+const stats = [
+  { value: '100%', label: 'Client-Side Execution' },
+  { value: 'Zero', label: 'Server Round-Trips' },
+  { value: '6', label: 'Production Engines' },
+  { value: 'Zero', label: 'Data Egress' },
+];
+
+const categories = [
+  { id: 'all', label: 'All Utilities' },
+  { id: 'config', label: 'Config Tools' },
+  { id: 'privacy', label: 'Privacy & Masking' },
+  { id: 'network', label: 'Network Engines' }
+];
+
+// Rich Structural JSON-LD Data for Search Graph Aggregations
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://configdev.com",
+      "url": "https://configdev.com",
+      "name": "ConfigDev - Free Secure Online Developer Tools Suite",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Runs client-side inside standard browser runtime frames.",
+      "description": "Secure client-side web utility suite for DevOps, SREs, and architects. Instantly convert crontab expressions to systemd timers, parse env config properties, redact log PII strings, or calculate complex IPv4 CIDR boundaries safely with zero network overhead.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://configdev.com/#faq",
+      "mainEntity": faqs.map(f => ({
+        "@type": "Question",
+        "name": f.question,
+        "acceptedAnswer": { "@type": "Answer", "text": f.answer }
+      }))
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://configdev.com/#tools-list",
+      "name": "Available DevOps and Utility Modules",
+      "numberOfItems": allTools.length,
+      "itemListElement": allTools.map((tool, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `https://configdev.com${tool.href}`,
+        "name": tool.title,
+        "description": tool.description
+      }))
+    }
+  ]
+};
+---
+
+<Layout
+  title="Free Secure Developer Tools & Config Utilities | ConfigDev"
+  description="Free client-side DevOps toolkit: crontab-to-systemd, PII log scrubbing, .env parsing, and CIDR subnetting—zero network upload. Explore now."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <main id="main-content" class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <a href="#tool-directory" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-neutral-900 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium">
+      Skip to tools
+    </a>
+
+    <header class="mb-10">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-xs font-semibold text-emerald-700 uppercase tracking-widest mb-5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" aria-hidden="true"></span>
+        All processing runs completely in your browser
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-neutral-900 tracking-tight leading-tight mb-4" style="text-wrap: balance;">
+        Free Online Developer Tools &amp; Infrastructure Utilities
+      </h1>
+      <p class="text-lg text-neutral-500 max-w-xl leading-relaxed">
+        A focused collection of secure local-execution tools for DevOps engineers, cloud architects, and backend developers. No accounts, no uploads, no logs.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 border border-neutral-200 rounded-xl overflow-hidden bg-neutral-50 mb-10">
+      {stats.map((stat, idx) => (
+        <div class={`flex flex-col items-center justify-center py-5 px-4 border-neutral-200 ${
+          idx % 2 === 0 ? 'border-r' : ''
+        } ${
+          idx < 2 ? 'border-b md:border-b-0' : ''
+        } ${
+          idx === 1 ? 'md:border-r' : ''
+        } ${
+          idx === 2 ? 'md:border-r' : ''
+        }`}>
+          <span class="text-xl font-bold text-neutral-900 tabular-nums">{stat.value}</span>
+          <span class="text-xs text-neutral-500 font-medium mt-1 text-center">{stat.label}</span>
+        </div>
+      ))}
+    </div>
+
+    <div class="mb-8">
+      <label for="tool-search" class="sr-only">Search all configuration tools</label>
+      <div class="relative max-w-2xl">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none" aria-hidden="true">
+          <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"></path>
+          </svg>
+        </div>
+        <input
+          type="search"
+          id="tool-search"
+          name="tool-search"
+          autocomplete="off"
+          spellcheck="false"
+          class="block w-full pl-10 pr-4 py-3 bg-white border border-neutral-200 rounded-lg text-neutral-900 text-sm placeholder-neutral-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:border-neutral-400 transition-shadow"
+          placeholder="Search tools, formats, or conversions&#8230;"
+        />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-10 border-b border-neutral-200" role="tablist" aria-label="Filter by category">
+      {categories.map((cat, i) => (
+        <button
+          type="button"
+          role="tab"
+          data-category-tab={cat.id}
+          aria-selected={i === 0}
+          class={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 transition-colors cursor-pointer data-[active=true]:bg-neutral-900 data-[active=true]:text-white bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50`}
+          data-active={i === 0 ? "true" : "false"}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+
+    <div id="empty-state" class="hidden text-center py-12 border border-dashed border-neutral-200 rounded-xl mb-14">
+      <p class="text-sm font-medium text-neutral-500">No tools match your active filter parameters or search expressions.</p>
+    </div>
+
+    <div id="tool-directory" class="space-y-14 mb-20">
+
+      <section id="section-config" data-category-section="config" aria-labelledby="heading-config-tools" class="transition-opacity duration-150">
+        <h2 id="heading-config-tools" class="text-base font-semibold text-neutral-500 uppercase tracking-wider mb-5 pb-3 border-b border-neutral-100">
+          Configuration &amp; Server Tools
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {toolsConfig.map((tool) => (
+            <a
+              href={tool.href}
+              data-tool-card
+              class="group flex flex-col bg-white border border-neutral-200 rounded-lg p-5 hover:border-neutral-300 hover:bg-neutral-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-1 cursor-pointer"
+            >
+              <div class="flex items-start justify-between mb-4">
+                <div class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-neutral-100 text-neutral-600 group-hover:bg-neutral-200 transition-colors">
+                  <Fragment set:html={tool.icon} />
+                </div>
+                <svg class="w-4 h-4 text-neutral-300 group-hover:text-neutral-500 transition-colors mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </div>
+              <h3 class="text-sm font-semibold text-neutral-900 mb-1.5 leading-snug data-title">{tool.title}</h3>
+              <p class="text-sm text-neutral-500 leading-relaxed data-desc">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section id="section-privacy" data-category-section="privacy" aria-labelledby="heading-privacy-tools" class="transition-opacity duration-150">
+        <h2 id="heading-privacy-tools" class="text-base font-semibold text-neutral-500 uppercase tracking-wider mb-5 pb-3 border-b border-neutral-100">
+          Privacy &amp; Identity Protections
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {toolsPrivacy.map((tool) => (
+            <a
+              href={tool.href}
+              data-tool-card
+              class="group flex flex-col bg-white border border-neutral-200 rounded-lg p-5 hover:border-neutral-300 hover:bg-neutral-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-1 cursor-pointer"
+            >
+              <div class="flex items-start justify-between mb-4">
+                <div class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-neutral-100 text-neutral-600 group-hover:bg-neutral-200 transition-colors">
+                  <Fragment set:html={tool.icon} />
+                </div>
+                <svg class="w-4 h-4 text-neutral-300 group-hover:text-neutral-500 transition-colors mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </div>
+              <h3 class="text-sm font-semibold text-neutral-900 mb-1.5 leading-snug data-title">{tool.title}</h3>
+              <p class="text-sm text-neutral-500 leading-relaxed data-desc">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section id="section-network" data-category-section="network" aria-labelledby="heading-network-tools" class="transition-opacity duration-150">
+        <h2 id="heading-network-tools" class="text-base font-semibold text-neutral-500 uppercase tracking-wider mb-5 pb-3 border-b border-neutral-100">
+          Network &amp; Data Architecture
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {toolsNetwork.map((tool) => (
+            <a
+              href={tool.href}
+              data-tool-card
+              class="group flex flex-col bg-white border border-neutral-200 rounded-lg p-5 hover:border-neutral-300 hover:bg-neutral-50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-1 cursor-pointer"
+            >
+              <div class="flex items-start justify-between mb-4">
+                <div class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-neutral-100 text-neutral-600 group-hover:bg-neutral-200 transition-colors">
+                  <Fragment set:html={tool.icon} />
+                </div>
+                <svg class="w-4 h-4 text-neutral-300 group-hover:text-neutral-500 transition-colors mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </div>
+              <h3 class="text-sm font-semibold text-neutral-900 mb-1.5 leading-snug data-title">{tool.title}</h3>
+              <p class="text-sm text-neutral-500 leading-relaxed data-desc">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+    </div>
+
+    <section id="platform-capabilities" aria-labelledby="platform-capabilities-heading" class="mb-20 border-t border-neutral-200 pt-10">
+      <h2 id="platform-capabilities-heading" class="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-6">Core Capabilities Breakdown</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-neutral-600 leading-relaxed">
+        <div>
+          <h3 class="font-bold text-neutral-900 mb-2">Advanced Config File Parsers</h3>
+          <p class="mb-3">Managing decoupled app environments is standard across microservices stacks. The <strong>Env to JSON</strong> and <strong>JSON to Env Converter</strong> engines optimize system migrations. They efficiently handle multi-line parsing strings, variable injections, bracket notation normalization, and complex array conversions without breaking downstream code execution loops.</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-neutral-900 mb-2">Automated Infrastructure Utilities</h3>
+          <p class="mb-3">Transition structural definitions between standard layout matrices instantly. The <strong>Crontab to Systemd</strong> tool safely handles calendar execution targets, converting arbitrary chronometer syntax strings into robust Linux system configuration blocks. Similarly, the <strong>CSV to JSON Schema Builder</strong> automatically inspects columns to output schema frameworks built to the strict Draft-07 specification.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="platform-overview" aria-labelledby="platform-overview-heading" class="mb-20 border-t border-neutral-200 pt-10">
+      <h2 id="platform-overview-heading" class="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-6">About ConfigDev</h2>
+      <div class="space-y-5 text-sm text-neutral-600 leading-relaxed text-justify">
+        <p>ConfigDev is a utility suite built for systems administrators, cloud architects, DevOps practitioners, and backend engineers who handle sensitive infrastructure data as part of their daily workflow. Tasks like subnet calculation, environment variable parsing, and log redaction are routine, but the tools built to perform them are often not: most online utilities process input on a remote server, which means crontab strings, environment secrets, and raw log dumps get transmitted off-device to run through someone else's backend. ConfigDev removes that step entirely. Every transformation runs inside your browser's local JavaScript engine — nothing you type or paste is sent anywhere.</p>
+        <p>This is a data sovereignty model, not a feature flag. Because execution never leaves the client, there is no network request to intercept, no remote log to subpoena or breach, and no third-party server that ever holds a copy of your data — even momentarily. That's a direct reduction in attack surface: it eliminates the risk of data exposure in transit, removes ConfigDev as a potential party to a man-in-the-middle attack, and means there is no backend datastore of user input to secure, audit, or worry about in the event of an incident. We don't log your inputs, because we architecturally cannot — there is no ingestion pipeline for them to flow into. This is data minimization by construction: the only way to guarantee data isn't collected, retained, or exposed is to never receive it in the first place.</p>
+        <p>Functionally, this also means the tools behave the way local CLI utilities do. Calculations and conversions render as you type, with no submit step and no round-trip latency, because there's no round trip to wait on. Once the page loads, every tool — crontab-to-systemd translation, CIDR boundary math, env/JSON conversion, PII redaction — continues to work fully offline. The interface is intentionally plain: this is infrastructure tooling, not a product demo, and it's built to be trusted by engineers who'd rather verify a tool's behavior than take a vendor's word for it.</p>
+      </div>
+    </section>
+
+    <section id="faq" aria-labelledby="faq-heading" class="mb-24 border-t border-neutral-200 pt-10">
+      <h2 id="faq-heading" class="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-8">Technical Architecture &amp; Privacy FAQ</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-0">
+        {faqs.map((faq) => (
+          <article class="py-8 border-b border-neutral-100 last:border-0">
+            <h3 class="text-sm font-semibold text-neutral-900 mb-2 leading-snug">{faq.question}</h3>
+            <p class="text-sm text-neutral-500 leading-relaxed text-justify">{faq.answer}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+  </main>
+</Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('tool-search') as HTMLInputElement | null;
+    const categoryTabs = document.querySelectorAll('[data-category-tab]');
+    const categorySections = document.querySelectorAll('[data-category-section]');
+    const emptyState = document.getElementById('empty-state');
+
+    let activeCategory = 'all';
+    let searchQuery = '';
+
+    function filterDashboard() {
+      let totalVisibleCards = 0;
+
+      categorySections.forEach((section) => {
+        const htmlSection = section as HTMLElement;
+        const sectionCategory = htmlSection.dataset.categorySection;
+        const cards = htmlSection.querySelectorAll('[data-tool-card]');
+        let visibleCardsInSection = 0;
+
+        // Check category macro matching
+        const categoryMatches = activeCategory === 'all' || activeCategory === sectionCategory;
+
+        cards.forEach((card) => {
+          const htmlCard = card as HTMLElement;
+          const title = htmlCard.querySelector('.data-title')?.textContent?.toLowerCase() || '';
+          const desc = htmlCard.querySelector('.data-desc')?.textContent?.toLowerCase() || '';
+          
+          // Check micro term search text match
+          const searchMatches = title.includes(searchQuery) || desc.includes(searchQuery);
+
+          if (categoryMatches && searchMatches) {
+            htmlCard.classList.remove('hidden');
+            visibleCardsInSection++;
+            totalVisibleCards++;
+          } else {
+            htmlCard.classList.add('hidden');
+          }
+        });
+
+        // Toggle entire context wrappers if cards inside drop to zero
+        if (visibleCardsInSection > 0) {
+          htmlSection.classList.remove('hidden');
+        } else {
+          htmlSection.classList.add('hidden');
+        }
+      });
+
+      // Handle blank array lookup visibility states
+      if (totalVisibleCards === 0) {
+        emptyState?.classList.remove('hidden');
+      } else {
+        emptyState?.classList.add('hidden');
+      }
+    }
+
+    // Input text listener loop
+    searchInput?.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      searchQuery = target.value.toLowerCase().trim();
+      filterDashboard();
+    });
+
+    // Tab event switch matrix
+    categoryTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const htmlTab = tab as HTMLElement;
+        const selectedCat = htmlTab.dataset.categoryTab || 'all';
+
+        // Swap tab active visual attribute structures
+        categoryTabs.forEach((t) => {
+          t.setAttribute('data-active', 'false');
+          t.setAttribute('aria-selected', 'false');
+        });
+        htmlTab.setAttribute('data-active', 'true');
+        htmlTab.setAttribute('aria-selected', 'true');
+
+        activeCategory = selectedCat;
+        filterDashboard();
+      });
+    });
+  });
+</script>

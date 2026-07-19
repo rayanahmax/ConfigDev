@@ -1,0 +1,434 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PiiScrubber from '../components/tools/PiiScrubber';
+import RelatedTools from '../components/shared/RelatedTools.astro';
+
+const pageFaqs = [
+  {
+    q: "Is it safe to drop production application logs or access credentials into this web scrubber?",
+    a: "100% yes. The scrubbing script executes sequentially inside your browser engine's local thread context (V8 runtime sandbox). No textual payloads, error strings, or logging metadata streams cross network hooks, making it completely secure for handling sensitive corporate audit footprints, SOC2 compliance protocols, and proprietary system outputs."
+  },
+  {
+    q: "How does the regex execution matrix preserve standard configuration layouts?",
+    a: "The tool targets high-intensity substring patterns (like matching IP nodes or credential sequences) and maps replacement strings directly over the target zones. Line numbers, whitespace boundaries, syntax arrays, and standard application trace hierarchies stay perfectly preserved."
+  },
+  {
+    q: "Can I download this tool or use it completely offline?",
+    a: "Yes. Once the page builds and finishes loading within your active browser layer, all processing tools execute without sending any outbound external API calls. You can save or cache the page or isolate your networking interface completely, and the local transformation engine will continue executing perfectly with zero network footprint."
+  },
+  {
+    q: "Which PII types and data structures are covered by the local signature filters?",
+    a: "The detection matrix catches IPv4 addresses, standard email formats, JWT tokens, credit card sequences (Luhn-adjacent strings), and typical API keys/secrets formatted in assignment structures (such as matching keys like bearer tokens, secret, password, or auth strings)."
+  },
+  {
+    q: "Is there a file size limitation when filtering enterprise application logs?",
+    a: "Because all mutations happen in local heap memory within your browser's V8 thread, the performance limit is tied directly to your local hardware configuration. It comfortably streams multi-megabyte log extracts, crash dumps, and text blocks instantly with zero lag."
+  },
+  {
+    q: "What is a PII Masker?",
+    a: "It replaces Personally Identifiable Information with generic placeholders."
+  },
+  {
+    q: "What is a Log Scrubber?",
+    a: "It removes sensitive data from application logs before storage."
+  },
+  {
+    q: "Why use these tools?",
+    a: "They prevent data leaks and maintain compliance with privacy laws."
+  },
+  {
+    q: "What regulations require this?",
+    a: "GDPR, HIPAA, PCI-DSS, and CCPA require strict data protection."
+  },
+  {
+    q: "How does it find PII?",
+    a: "It uses Regular Expressions, checksum validation, and machine learning models."
+  },
+  {
+    q: "What data types are masked?",
+    a: "Names, emails, phone numbers, credit cards, and IP addresses."
+  },
+  {
+    q: "What is redaction?",
+    a: "The permanent removal or blacking out of sensitive text data."
+  },
+  {
+    q: "What is tokenization?",
+    a: "Replacing real data with unique, non-sensitive, algorithmic reference tokens."
+  },
+  {
+    q: "What is hashing?",
+    a: "Converting data into a fixed-length string that cannot be reversed."
+  },
+  {
+    q: "Where does scrubbing happen?",
+    a: "At the application level or via an intermediate proxy pipeline."
+  },
+  {
+    q: "Does it slow down logs?",
+    a: "Minimal latency is added, usually optimized to under a millisecond."
+  },
+  {
+    q: "Can it handle structured logs?",
+    a: "Yes, it parses JSON, XML, and key-value log formats easily."
+  },
+  {
+    q: "How are false positives handled?",
+    a: "You can configure custom allowlists for safe, non-sensitive terms."
+  },
+  {
+    q: "Is configuration customizable?",
+    a: "Yes, rules can be updated via YAML or JSON configuration files."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://configdev.com/pii-masker-log-scrubber",
+      "url": "https://configdev.com/pii-masker-log-scrubber",
+      "name": "PII Masker & Log Scrubber Online - Free & Secure",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Runs entirely client-side inside local browser memory sandbox frameworks.",
+      "description": "A free, web-based PII masking tool running entirely client-side. Instantly sanitize server logs, exception dumps, and system text vectors by replacing sensitive PII data fields with clean mask variables locally before sharing with LLMs or issue queues."
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://configdev.com/pii-masker-log-scrubber/#faq",
+      "mainEntity": pageFaqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://configdev.com/" },
+        { "@type": "ListItem", "position": 2, "name": "PII Masker & Log Scrubber", "item": "https://configdev.com/pii-masker-log-scrubber" }
+      ]
+    }
+  ]
+};
+---
+
+<Layout
+  title="PII Masker & Log Scrubber - Free & Offline | ConfigDev"
+  description="Redact emails, API keys, credit card numbers, and IPs from production logs locally—safe to share with LLMs or Jira. 100% client-side. Scrub now."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    {/* Breadcrumb Navigation */}
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        All Free Developer Tools
+      </a>
+    </nav>
+
+    {/* Header Section Layout */}
+    <header class="mb-8 pb-8 border-b border-neutral-200">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-neutral-900 tracking-tight mb-3">
+            PII Masker &amp; Log Scrubber Online
+          </h1>
+          <p class="text-base text-neutral-500 max-w-xl leading-relaxed">
+            Free, zero-ingress tool to securely redact data strings from error dumps, system logs, and server traces. Automatically strips emails, credentials, token arrays, and IP addresses using zero-network local execution filters.
+          </p>
+        </div>
+
+        <div class="shrink-0 inline-flex items-center gap-2 px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-medium text-neutral-600 whitespace-nowrap self-start" role="status">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true"></span>
+          100% Free &amp; Secure Client-Side Sandbox
+        </div>
+      </div>
+    </header>
+
+    {/* Privacy Assurance Matrix & Trust Widgets */}
+    <div class="mb-8 flex flex-col md:flex-row gap-4">
+      {/* Privacy Status Component */}
+      <div class="flex-1 flex items-center justify-center gap-4 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-4 shadow-sm">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          <span class="text-sm font-bold text-emerald-900">Security: 100% Local</span>
+        </div>
+        <div class="w-px h-8 bg-emerald-200"></div>
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          <span class="text-sm font-bold text-emerald-900">Network: 0 Requests</span>
+        </div>
+      </div>
+
+      {/* Transparency / Regex Patterns */}
+      <details class="group bg-neutral-50 border border-neutral-200 rounded-lg flex-1 min-w-[300px]">
+        <summary class="flex items-center justify-between cursor-pointer px-4 py-4 text-sm font-bold text-neutral-800 marker:hidden">
+          <span class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            Transparency: View Raw Regex Patterns
+          </span>
+          <svg class="w-5 h-5 text-neutral-500 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        </summary>
+        <div class="px-4 pb-4">
+          <pre class="bg-neutral-900 text-emerald-400 p-3 rounded text-xs overflow-x-auto font-mono">
+<code>{`// Email Detection
+/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/gi
+
+// IPv4 Detection
+/\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b/g
+
+// Credit Card (Basic Luhn-adjacent)
+/\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b|\\b\\d{13,16}\\b/g
+
+// JWT Tokens
+/\\beyJ[a-zA-Z0-9_-]{2,}\\.[a-zA-Z0-9_-]{2,}\\.[a-zA-Z0-9_-]{2,}\\b/g`}</code>
+          </pre>
+        </div>
+      </details>
+    </div>
+
+    {/* Quick-Load Presets */}
+    <div class="mb-4 flex flex-wrap items-center gap-2">
+      <span class="text-xs font-bold text-neutral-500 uppercase tracking-wider mr-2 font-mono">Quick Load:</span>
+      <button data-preset="aws" class="preset-btn px-3 py-1.5 text-xs font-medium bg-white border border-neutral-200 rounded hover:bg-neutral-50 transition-colors text-neutral-700 cursor-pointer">AWS Log</button>
+      <button data-preset="stack" class="preset-btn px-3 py-1.5 text-xs font-medium bg-white border border-neutral-200 rounded hover:bg-neutral-50 transition-colors text-neutral-700 cursor-pointer">Stack Trace</button>
+      <button data-preset="json" class="preset-btn px-3 py-1.5 text-xs font-medium bg-white border border-neutral-200 rounded hover:bg-neutral-50 transition-colors text-neutral-700 cursor-pointer">JSON Payload</button>
+    </div>
+
+    {/* Active Functional Workspace Instance */}
+    <div class="mb-4">
+      <PiiScrubber client:load />
+    </div>
+
+    {/* UI/UX: Copy and Report Issue Buttons */}
+    <div class="mb-8 flex flex-wrap items-center justify-end gap-3">
+      <button 
+        id="global-copy-btn"
+        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+        <span>Copy Sanitized Output</span>
+      </button>
+      <a 
+        href="https://github.com/rayanahmax/ConfigDev/issues/new?body=Please%20describe%20the%20issue:%0A%0A"
+        target="_blank" rel="noopener noreferrer"
+        class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-neutral-600 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+        Report Issue
+      </a>
+    </div>
+
+    <script>
+      // Quick Load Presets Logic
+      const presets = {
+        aws: `2026-07-19T10:00:00Z [ERROR] Failed to execute lambda. 
+Event: {"user_email": "john.doe@example.com", "ip_address": "192.168.1.1"}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1...`,
+        stack: `Exception in thread "main" java.sql.SQLException: Access denied for user 'admin'@'10.0.0.55' (using password: YES)
+db_password="SuperSecretPassword123!"
+  at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:129)`,
+        json: `{
+  "transaction": "txn_8932489",
+  "credit_card": "4111-2222-3333-4444",
+  "api_key": "sk_live_99a8x7b6c5d4e3f2g1h0"
+}`
+      };
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.getAttribute('data-preset');
+          const text = presets[type];
+          
+          const textarea = document.querySelector('textarea');
+          if (textarea) {
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+            nativeInputValueSetter.call(textarea, text);
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        });
+      });
+
+      // Global Copy Logic
+      const copyBtn = document.getElementById('global-copy-btn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', async (e) => {
+          const btn = e.currentTarget;
+          // Find the pre tag within the output section
+          const outputPre = document.querySelector('.bg-neutral-900 pre');
+          if (outputPre && outputPre.textContent) {
+            try {
+              await navigator.clipboard.writeText(outputPre.textContent);
+              const span = btn.querySelector('span');
+              if (span) {
+                const origText = span.textContent;
+                span.textContent = "Copied!";
+                setTimeout(() => { span.textContent = origText; }, 2000);
+              }
+            } catch (err) {
+              console.error('Failed to copy', err);
+            }
+          }
+        });
+      }
+    </script>
+
+    {/* Trust Validation Vector Banner */}
+    <div class="mb-16 rounded-lg border-2 border-emerald-400 bg-emerald-50 px-5 py-4 text-center shadow-sm">
+      <p class="text-sm sm:text-base font-bold text-emerald-900 tracking-wide">
+        Verifiable Security — Zero Network Overhead · Open DevTools Network Tab to Confirm
+      </p>
+    </div>
+
+    {/* 1. Walkthrough Stack Section */}
+    <section id="how-it-works" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="steps-heading">
+      <h2 id="steps-heading" class="text-lg font-bold text-neutral-900 mb-4">How to Sanitize Logs and Redact PII</h2>
+      <ol class="space-y-4 list-decimal list-inside text-sm text-neutral-600 leading-relaxed">
+        <li>
+          <strong class="text-neutral-900">Insert Log Contents:</strong> Paste your raw server outputs, exception traces, or stack errors directly into the unredacted left text panel.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Verify Detected Metrics:</strong> Review the active analysis indicators at the bottom to gauge how many credential patterns were neutralized.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Extract Anonymized Records:</strong> Instantly copy your safe, scrubbed log text blocks to safely paste them downstream into LLMs, issue queues, or diagnostics.
+        </li>
+      </ol>
+    </section>
+
+    {/* 2. Feature Deep Dives Stack Section */}
+    <section id="advanced-features" class="max-w-3xl mx-auto mb-16" aria-labelledby="advanced-heading">
+      <h2 id="advanced-heading" class="text-lg font-bold text-neutral-900 mb-6">Understanding Log Anonymization Routines</h2>
+      <div class="space-y-8">
+        
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">1. Context-Aware Keyword Extraction</h3>
+          <p class="text-sm text-neutral-600 mb-3 leading-relaxed">
+            Standard identifiers like strings matching explicit key assignments (<code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded">auth=secret_token</code>) use
+            intelligent back-reference matching groups. Instead of blowing up your formatting parameters or discarding whole config sentences, it surgically extracts the isolated secret values and places an explicit placeholder label over them.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">2. Localized Boundary Isolation</h3>
+          <p class="text-sm text-neutral-600 mb-3 leading-relaxed">
+            By running completely client-side in the V8 browser sandbox, parsing latency remains zero even when handling heavy multi-megabyte enterprise file streams. Your sensitive application state structures never encounter middle-tier backend servers or API gateway components.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-base font-bold text-neutral-900 mb-1">3. Anonymizing Logs for LLMs &amp; AI Ingestion</h3>
+          <p class="text-sm text-neutral-600 mb-3 leading-relaxed">
+            Before pasting server traces into public or third-party AI interfaces like ChatGPT or Claude for debugging assistance, masking credentials is non-negotiable. This tool scrubs clear-text passwords, tokens, and tracking hashes into standardized structural tokens, giving you clean code debugging context without compromising infrastructure vectors or breaking data privacy policies.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    {/* 3. Target Syntax Map Examples Stack Section */}
+    <section id="conversion-example" class="max-w-3xl mx-auto mb-16" aria-labelledby="example-heading">
+      <h2 id="example-heading" class="text-xs font-bold uppercase tracking-wider text-neutral-400 font-mono mb-4">Target Scrubbing Syntax Mapping</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-50 border border-neutral-200 rounded-xl p-5 font-mono text-xs text-neutral-700">
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Raw Input With PII Leakage</div>
+          <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto">[ERROR] Connect failed for admin@db.internal
+[INFO] Attempting reconnect via host 192.168.1.45
+[DEBUG] Config dump: api_key="sk_live_99a8x"</pre>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Masked Sandbox Output</div>
+          <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto">[ERROR] Connect failed for [EMAIL]
+[INFO] Attempting reconnect via host [IP_ADDRESS]
+[DEBUG] Config dump: api_key="[REDACTED_SECRET]"</pre>
+        </div>
+      </div>
+    </section>
+
+    {/* 4. Cross-Language Programmatic Implementations */}
+    <section id="programmatic-pii" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="programmatic-heading">
+      <h2 id="programmatic-heading" class="text-lg font-bold text-neutral-900 mb-4">Programmatic PII Detection &amp; Masking Alternatives</h2>
+      <div class="text-sm text-neutral-600 space-y-6 leading-relaxed">
+        <p>
+          If you are looking to integrate high-volume PII masking directly into your CI/CD pipelines or backend microservices instead of using a web interface, several robust open-source library choices exist across programming backends.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Python PII Masking Ecosystem</h3>
+            <p class="text-xs text-neutral-500 mb-3">
+              For automation scripts, data science workflows, and backend processing pipelines, Microsoft's <strong>Presidio Analyzer &amp; Anonymizer</strong> engine stands out as the industry standard.
+            </p>
+            <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto">pip install presidio-analyzer presidio-anonymizer</pre>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Golang PII Detection Matrix</h3>
+            <p class="text-xs text-neutral-500 mb-3">
+              When microsecond processing speeds and low-overhead system scaling are required for heavy proxy logs, standard Go regular expression parsing trees handle streaming data smoothly.
+            </p>
+            <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto">import "regexp" // For custom compiled token boundaries</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* 5. SRE Technical Context Stack Section */}
+    <section id="technical-context" class="max-w-3xl mx-auto mb-16" aria-labelledby="context-heading">
+      <h2 id="context-heading" class="text-lg font-bold text-neutral-900 mb-4">Maintaining Compliance in Site Reliability Engineering</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          Contemporary compliance frameworks—including HIPAA, GDPR, and PCI-DSS—require comprehensive handling boundaries around access logs and troubleshooting diagnostic summaries. Accidentally streaming identifiable user keys or infrastructure paths down to generic processing layers or shared diagnostic engines creates major audit vulnerabilities.
+        </p>
+        <p>
+          ConfigDev neutralizes these leak vectors directly at the origin threshold. Masking metrics systematically inside the user browser layout lets engineers seamlessly troubleshoot problems without breaking compliance bounds or exposing infrastructure metadata profiles.
+        </p>
+      </div>
+    </section>
+
+    {/* Unblock AI for your Workflow Section */}
+    <section id="unblock-ai" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="unblock-ai-heading">
+      <h2 id="unblock-ai-heading" class="text-xl font-bold text-neutral-900 mb-6">Unblock AI for your Workflow</h2>
+      <div class="space-y-4 text-sm text-neutral-600 leading-relaxed text-justify">
+        <p>
+          In modern development pipelines, generative AI tools like ChatGPT, Claude, and Gemini have become indispensable for debugging complex stack traces and deciphering cryptic server errors. However, strict enterprise data privacy policies and compliance regulations often create a massive friction point: the <strong>PII Compliance Barrier</strong>. Developers are frequently forced to manually redact sensitive information like API keys, customer emails, or internal IP addresses before seeking AI assistance, slowing down resolution times and introducing human error.
+        </p>
+        <p>
+          Our local-first PII masker eliminates this friction entirely. By running deterministic scrubbing algorithms directly within your browser's V8 runtime sandbox, it instantly neuters sensitive payloads without ever transmitting your raw data over the network. This zero-ingress architecture ensures that proprietary system outputs never touch a backend server, completely mitigating the risk of accidental data leaks into external logging systems or third-party databases.
+        </p>
+        <p>
+          With your compliance requirements satisfied at the client layer, you can seamlessly bridge the gap between secure enterprise infrastructure and public AI platforms. Simply paste your raw logs, let the local client replace secrets with standardized tokens, and safely forward the sanitized output to your LLM of choice. You get all the contextual debugging power of modern AI without compromising your security posture or violating data governance rules.
+        </p>
+      </div>
+    </section>
+
+    {/* Technical FAQ List Module */}
+    <section id="tool-faq" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 pb-12" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" class="text-2xl font-bold text-neutral-900 mb-8">Frequently Asked Questions</h2>
+      
+      <div class="space-y-6">
+        {pageFaqs.map((faq, index) => (
+          <div key={index}>
+            <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">{faq.q}</h4>
+            <p class="text-xs text-neutral-500 leading-relaxed text-justify">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <RelatedTools tools={[
+      { href: '/env-to-json', title: 'Env to JSON Converter', description: 'Parse standard .env files into clean, structured JSON objects ready for any pipeline.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
+      { href: '/json-to-env', title: 'JSON to Env Converter', description: 'Flatten nested JSON objects into standard flat .env key-value lines with configurable delimiters.', icon: 'M6 16l-4-4 4-4M18 8l4 4-4 4' },
+      { href: '/csv-to-json-schema', title: 'CSV to JSON Schema Builder', description: 'Inspect CSV column structures and auto-generate a valid JSON Schema Draft-07 file.', icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582 4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4' },
+    ]} />
+
+  </main>
+</Layout>

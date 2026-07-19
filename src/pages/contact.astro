@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Contact ConfigDev | DevOps Support & Feedback"
+  description="Questions about ConfigDev's free client-side DevOps tools? Send us feature requests, bug reports, or tool ideas. Our team reads every message."
+>
+  <main id="main-content" class="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold text-neutral-900 mb-4 tracking-tight">Contact Us</h1>
+      <p class="text-lg text-neutral-600">How can we help?</p>
+      
+      <!-- Privacy Trust Indicator -->
+      <div class="mt-6 p-4 bg-emerald-50 border border-emerald-100 rounded-lg" role="alert">
+        <section>
+  <h2 class="text-base font-bold text-neutral-900 mb-3">1. Client-Side Architecture</h2>
+  <p>
+    ConfigDev is built to be 100% client-based. We do not route your data to any server, database, or external backend infrastructure. All conversions, calculations, and data processing occur locally within your browser's memory. Because the code runs entirely on your device, your information never leaves your machine, ensuring your sensitive configuration files remain private and secure.
+  </p>
+</section>
+      </div>
+    </header>
+
+    <!-- Formspree/Getform endpoint integration suggested below -->
+    <form action="https://formspree.io/f/xqevegld" method="POST" class="space-y-6">
+      <div>
+        <label for="name" class="block text-sm font-semibold text-neutral-900 mb-2">Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          required 
+          autocomplete="name"
+          class="block w-full px-4 py-2.5 bg-white border border-neutral-300 rounded-lg text-neutral-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none" 
+        />
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-semibold text-neutral-900 mb-2">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          required 
+          autocomplete="email"
+          class="block w-full px-4 py-2.5 bg-white border border-neutral-300 rounded-lg text-neutral-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none" 
+        />
+      </div>
+
+      <div>
+        <label for="comments" class="block text-sm font-semibold text-neutral-900 mb-2">Comments</label>
+        <textarea 
+          id="comments" 
+          name="comments" 
+          rows="5" 
+          required 
+          class="block w-full px-4 py-2.5 bg-white border border-neutral-300 rounded-lg text-neutral-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none resize-none"
+        ></textarea>
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full bg-neutral-900 text-white py-3 px-6 rounded-lg font-semibold hover:bg-neutral-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-neutral-900 active:scale-[0.98]"
+      >
+        Send Message
+      </button>
+    </form>
+  </main>
+</Layout>

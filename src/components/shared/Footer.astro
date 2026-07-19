@@ -1,0 +1,47 @@
+---
+// Evaluates dynamically during the static build generation loop
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="w-full border-t border-neutral-200 bg-neutral-50 mt-auto shrink-0" aria-labelledby="footer-heading">
+  <h2 id="footer-heading" class="sr-only">Footer</h2>
+  <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+    <p class="text-sm text-neutral-500">
+      &copy; {currentYear} ConfigDev. All rights reserved.
+    </p>
+    <div class="flex items-center gap-6 text-sm text-neutral-500" role="navigation" aria-label="Footer Documentation Links">
+      <a 
+        href="/terms" 
+        class="hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-sm"
+      >
+        Terms
+      </a>
+      <a 
+        href="/privacy" 
+        class="hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-sm"
+      >
+        Privacy
+      </a>
+      <a 
+        href="/contact" 
+        class="hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-sm"
+      >
+        Contact
+      </a>
+      <a 
+        href="/about-us" 
+        class="hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-sm"
+      >
+        About Us
+      </a>
+      <a 
+        href="https://github.com/rayanahmax/ConfigDev" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 rounded-sm"
+      >
+        View ConfigDev Source Code on GitHub
+      </a>
+    </div>
+  </div>
+</footer>

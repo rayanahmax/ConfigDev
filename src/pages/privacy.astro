@@ -1,0 +1,62 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Privacy Policy - 100% Local Processing Sandbox | ConfigDev"
+  description="ConfigDev Privacy Policy: all tools run 100% in your browser—no server uploads, no tracking, no data retention. Your configs and logs stay local."
+>
+  <main class="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-neutral-600 text-sm leading-relaxed">
+    <header class="mb-10 pb-6 border-b border-neutral-200">
+      <h1 class="text-3xl font-bold text-neutral-900 tracking-tight mb-2">Privacy Policy</h1>
+      <p class="text-neutral-400">Effective Date: June 24, 2026</p>
+    </header>
+
+    <div class="space-y-8 text-justify">
+      <section>
+        <h2 class="text-base font-bold text-neutral-900 mb-3">1. Absolute Core Commitment</h2>
+        <p>
+          At ConfigDev, we build developer tools designed with an absolute zero-ingress architecture. We understand that you use our utilities to manipulate sensitive infrastructure assets, including production logs, environment secrets, and subnet maps. Your configurations, credentials, text fragments, and payloads are processed <strong>strictly within your local browser's memory threads (V8 engine context)</strong>. No data is transmitted across network sockets, stored on remote databases, or logged by any backend framework.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-neutral-900 mb-3">2. Data We Do Not Collect</h2>
+        <p>Because all transformations execute completely on your machine, we do not inspect, log, aggregate, or store:</p>
+        <ul class="list-disc list-inside mt-2 space-y-1.5 pl-2">
+          <li>Environment variables (<code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">.env</code> keys, API secrets, private database connection links).</li>
+          <li>Server configuration scripts, crontab rows, or systemd operational telemetry logs.</li>
+          <li>Personally Identifiable Information (PII) passed through our text-scrubbing modules.</li>
+          <li>IP addresses, network ranges, or subnet schemas dropped into calculation grids.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-neutral-900 mb-3">3. Telemetry and Analytics</h2>
+        <p>
+          To maintain performance markers and understand site health, we may utilize minimal, privacy-compliant analytical frameworks that log aggregate page views and browser environment metadata. These scripts explicitly <strong>do not and cannot bind or intercept text contents</strong> handled by our modular form inputs or client utility state loops.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-neutral-900 mb-3">4. Security Sandbox Framework</h2>
+        <p>
+          All operations instantly clean from system memory threads the exact moment you clear, refresh, or close your browser tab. We encourage corporate system administrators to monitor our software routines via their standard browser DevTools Network panel to independently verify that zero external network egress payloads occur during text compilation.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-bold text-neutral-900 mb-3">5. Third-Party Integrations</h2>
+        <p>
+          This website contains directional hyperlinks to developer repositories, standard open-source references, or tracking systems. We exert zero supervisory jurisdiction over external domain ecosystems. Users should verify the unique data policies governing third-party interfaces when leaving our sandbox runtime environment.
+        </p>
+      </section>
+
+      <section class="border-t border-neutral-200 pt-6">
+        <p class="text-xs text-neutral-400">
+          For any security verification or structural queries regarding the technical execution loop of our client-side software modules, please file an issue through our verified public open-source repository streams.
+        </p>
+      </section>
+    </div>
+  </main>
+</Layout>

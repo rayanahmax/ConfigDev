@@ -1,0 +1,22 @@
+# ConfigDev
+
+> Free online secure client-side developer tools and infrastructure utilities.
+
+ConfigDev is a high-performance web utility suite designed for systems administrators, cloud architects, DevOps practitioners, and backend engineers. It re-engineers traditional web utilities by shifting 100% of data transformation execution directly to the client browser's local sandbox environment (V8 engine memory pool) with absolute zero remote data ingress.
+
+## Core Capabilities & Tools
+
+- [Crontab to Systemd Converter](https://configdev.com/cron-to-systemd-converter): Translate UNIX cron expressions into native systemd `.service` and `.timer` unit files.
+- [Env to JSON Converter](https://configdev.com/env-to-json): Parse standard key-value `.env` files into clean structured JSON configuration objects with type-casting.
+- [JSON to Env Converter](https://configdev.com/json-to-env): Flatten nested JSON objects into standard flat `.env` key-value lines with custom delimiters.
+- [PII Masker & Log Scrubber](https://configdev.com/pii-masker-log-scrubber): Redact emails, secrets, tokens, and IP strings out of raw log dumps locally.
+- [CIDR Subnet Calculator](https://configdev.com/cidr-subnet-calculator): Compute subnet boundaries, usable host ranges, broadcast addresses, and masks for IPv4.
+- [CSV to JSON Schema Builder](https://configdev.com/csv-to-json-schema): Inspect CSV columns and auto-infer valid JSON Schema Draft-07 specification files.
+
+## Technical Architecture & Privacy
+
+- **100% Client-Side**: All parsing, masking, and calculation executes strictly inside the user's browser runtime thread context.
+- **Zero Server Round-Trips**: No network requests are made during tool execution, making it secure for sensitive production variables, environment secrets, and compliance mandates (SOC2, HIPAA, GDPR).
+- **Offline Capable**: Works fully offline once static pages are loaded.
+## Privacy Verification
+Users can verify our security posture by opening the browser's Network Tab (F12) while using any tool. You will observe that **zero outbound data requests** occur during the actual execution phase, ensuring your secrets remain in your local session.

@@ -1,0 +1,5 @@
+# Route /index.html to root cleanly
+/index.html / 301
+
+# Strip trailing slashes — redirect /page/ → /page (keeps trailingSlash: 'never' in sync)
+/*/  /:splat  301

@@ -1,0 +1,65 @@
+---
+export interface RelatedTool {
+  href: string;
+  title: string;
+  description: string;
+  icon: string; // inline SVG path (the `d` attribute value)
+}
+
+interface Props {
+  tools: RelatedTool[];
+  currentPath?: string;
+}
+
+const { tools } = Astro.props;
+---
+
+<section
+  id="related-tools"
+  class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 pb-12"
+  aria-labelledby="related-heading"
+>
+  <h2 id="related-heading" class="text-lg font-bold text-neutral-900 mb-6">
+    Related Utilities
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {tools.map((tool) => (
+      <a
+        href={tool.href}
+        class="group flex flex-col gap-2.5 rounded-xl border border-neutral-200 bg-neutral-50 p-4 hover:border-neutral-400 hover:bg-white hover:shadow-sm transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+      >
+        <div class="flex items-center gap-2.5">
+          <span class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-neutral-200 text-neutral-600 group-hover:text-neutral-900 group-hover:border-neutral-300 transition-colors">
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.75"
+                d={tool.icon}
+              />
+            </svg>
+          </span>
+          <span class="text-sm font-semibold text-neutral-800 group-hover:text-neutral-900 transition-colors leading-tight">
+            {tool.title}
+          </span>
+        </div>
+        <p class="text-xs text-neutral-500 leading-relaxed group-hover:text-neutral-600 transition-colors">
+          {tool.description}
+        </p>
+        <span class="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-amber-700 group-hover:gap-2 transition-all">
+          Open tool
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+          </svg>
+        </span>
+      </a>
+    ))}
+  </div>
+</section>
