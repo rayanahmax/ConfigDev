@@ -3,13 +3,14 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "lint": "astro check",
     "deploy": "wrangler pages deploy dist --project-name configdev --commit-dirty=true"
   },
   "dependencies": {
@@ -26,6 +27,8 @@
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "typescript": "^6.0.3",
     "wrangler": "^4.105.0"
   }
 }

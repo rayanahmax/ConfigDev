@@ -247,13 +247,19 @@ db_password="SuperSecretPassword123!"
 
       document.querySelectorAll('.preset-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const type = btn.getAttribute('data-preset');
-          const text = presets[type];
-          
+          const type = (btn as HTMLElement).getAttribute('data-preset');
+          if (!type) return;
+          const text = (presets as Record<string, string>)[type] ?? '';
+
           const textarea = document.querySelector('textarea');
           if (textarea) {
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
-            nativeInputValueSetter.call(textarea, text);
+            const descriptor = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value");
+            const nativeInputValueSetter = descriptor?.set;
+            if (nativeInputValueSetter) {
+              nativeInputValueSetter.call(textarea, text);
+            } else {
+              textarea.value = text;
+            }
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
           }
         });
@@ -263,7 +269,8 @@ db_password="SuperSecretPassword123!"
       const copyBtn = document.getElementById('global-copy-btn');
       if (copyBtn) {
         copyBtn.addEventListener('click', async (e) => {
-          const btn = e.currentTarget;
+          const btn = e.currentTarget as HTMLElement | null;
+          if (!btn) return;
           // Find the pre tag within the output section
           const outputPre = document.querySelector('.bg-neutral-900 pre');
           if (outputPre && outputPre.textContent) {
@@ -416,7 +423,7 @@ db_password="SuperSecretPassword123!"
       
       <div class="space-y-6">
         {pageFaqs.map((faq, index) => (
-          <div key={index}>
+          <div>
             <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">{faq.q}</h4>
             <p class="text-xs text-neutral-500 leading-relaxed text-justify">{faq.a}</p>
           </div>
