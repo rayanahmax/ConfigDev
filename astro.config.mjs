@@ -32,11 +32,13 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
-      // Exclude legal/utility pages — not useful for search indexers
+      // Exclude legal/utility pages and error pages — not useful for search indexers
       filter: (page) =>
         !page.includes('/terms') &&
         !page.includes('/privacy') &&
-        !page.includes('/contact'),
+        !page.includes('/contact') &&
+        !page.includes('/404') &&
+        !page.includes('/500'),
 
       // Priority tiers: hero tools at 1.0, all others at 0.9
       customPages: [],
@@ -44,13 +46,16 @@ export default defineConfig({
         const heroTools = [
           'https://configdev.com/cidr-subnet-calculator',
           'https://configdev.com/pii-masker-log-scrubber',
+          'https://configdev.com/k8s-manifest-sanitizer',
           'https://configdev.com/env-to-json',
           'https://configdev.com/json-to-env',
+          'https://configdev.com/cron-to-systemd-converter',
+          'https://configdev.com/csv-to-json-schema',
         ];
         const isHero = heroTools.some((url) => item.url === url || item.url === url + '/');
         return {
           ...item,
-          priority: isHero ? 1.0 : 0.9,
+          priority: isHero ? 1.0 : 0.8,
           changefreq: isHero ? EnumChangefreq.WEEKLY : EnumChangefreq.MONTHLY,
         };
       },
