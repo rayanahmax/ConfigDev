@@ -1,12 +1,27 @@
 ---
 // src/components/shared/Navbar.astro
-const toolLinks = [
-  { href: '/cron-to-systemd-converter', label: 'Crontab to Systemd' },
-  { href: '/env-to-json', label: 'Env to JSON Object' },
-  { href: '/json-to-env', label: 'JSON to Env Object' },
-  { href: '/pii-masker-log-scrubber', label: 'PII Masker & Scrubber' },
-  { href: '/cidr-subnet-calculator', label: 'CIDR Subnet Calculator' },
-  { href: '/csv-to-json-schema', label: 'CSV to JSON Schema' }
+const toolCategories = [
+  {
+    label: 'Infrastructure & Config',
+    tools: [
+      { href: '/cron-to-systemd-converter', label: 'Crontab to Systemd' },
+      { href: '/env-to-json', label: 'Env to JSON' },
+      { href: '/json-to-env', label: 'JSON to Env' },
+    ]
+  },
+  {
+    label: 'Security & DevSecOps',
+    tools: [
+      { href: '/pii-masker-log-scrubber', label: 'PII Masker & Scrubber' },
+    ]
+  },
+  {
+    label: 'Networking & Data',
+    tools: [
+      { href: '/cidr-subnet-calculator', label: 'CIDR Subnet Calculator' },
+      { href: '/csv-to-json-schema', label: 'CSV to JSON Schema' },
+    ]
+  }
 ];
 ---
 
@@ -51,16 +66,23 @@ const toolLinks = [
         <div 
           role="menu"
           aria-label="Available Utilities Suite"
-          class="absolute left-1/2 -translate-x-1/2 top-full w-56 rounded-xl border border-neutral-200 bg-white p-2 shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-150 transform translate-y-1 group-hover:translate-y-0"
+          class="absolute left-1/2 -translate-x-1/2 top-full w-64 rounded-xl border border-neutral-200 bg-white p-3 shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-all duration-150 transform translate-y-1 group-hover:translate-y-0"
         >
-          {toolLinks.map(tool => (
-            <a 
-              href={tool.href} 
-              role="menuitem"
-              class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
-            >
-              {tool.label}
-            </a>
+          {toolCategories.map((category, idx) => (
+            <div class={idx > 0 ? 'mt-3 pt-3 border-t border-neutral-100' : ''}>
+              <span class="block px-3 mb-1 text-[10px] font-semibold text-neutral-400 uppercase tracking-widest">
+                {category.label}
+              </span>
+              {category.tools.map(tool => (
+                <a
+                  href={tool.href}
+                  role="menuitem"
+                  class="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]"
+                >
+                  {tool.label}
+                </a>
+              ))}
+            </div>
           ))}
         </div>
       </div>
@@ -99,15 +121,24 @@ const toolLinks = [
       <a href="/" class="text-neutral-600 hover:text-neutral-900 py-1 transition-colors">Home</a>
       
       <div class="border-t border-neutral-100 pt-3 pb-1">
-        <span class="text-xs font-semibold text-neutral-400 uppercase tracking-wider block mb-2 px-1">Tools</span>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pl-2">
-          {toolLinks.map(tool => (
-            <a 
-              href={tool.href} 
-              class="block py-1 text-xs text-neutral-600 hover:text-neutral-900 transition-colors"
-            >
-              {tool.label}
-            </a>
+        <span class="text-xs font-semibold text-neutral-400 uppercase tracking-wider block mb-3 px-1">Tools</span>
+        <div class="space-y-4 pl-2">
+          {toolCategories.map((category) => (
+            <div>
+              <span class="block mb-1.5 text-[10px] font-semibold text-neutral-400 uppercase tracking-widest">
+                {category.label}
+              </span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                {category.tools.map(tool => (
+                  <a
+                    href={tool.href}
+                    class="block py-1 text-xs text-neutral-600 hover:text-neutral-900 transition-colors"
+                  >
+                    {tool.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

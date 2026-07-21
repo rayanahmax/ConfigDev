@@ -84,9 +84,9 @@ const stats = [
 
 const categories = [
   { id: 'all', label: 'All Utilities' },
-  { id: 'config', label: 'Config Tools' },
-  { id: 'privacy', label: 'Privacy & Masking' },
-  { id: 'network', label: 'Network Engines' }
+  { id: 'config', label: 'Infrastructure & Config' },
+  { id: 'privacy', label: 'Security & DevSecOps' },
+  { id: 'network', label: 'Networking & Data' }
 ];
 
 // Rich Structural JSON-LD Data for Search Graph Aggregations
@@ -219,7 +219,7 @@ const jsonLd = {
 
       <section id="section-config" data-category-section="config" aria-labelledby="heading-config-tools" class="transition-opacity duration-150">
         <h2 id="heading-config-tools" class="text-base font-semibold text-neutral-500 uppercase tracking-wider mb-5 pb-3 border-b border-neutral-100">
-          Configuration &amp; Server Tools
+          Infrastructure &amp; Config
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {toolsConfig.map((tool) => (
@@ -245,7 +245,7 @@ const jsonLd = {
 
       <section id="section-privacy" data-category-section="privacy" aria-labelledby="heading-privacy-tools" class="transition-opacity duration-150">
         <h2 id="heading-privacy-tools" class="text-base font-semibold text-neutral-500 uppercase tracking-wider mb-5 pb-3 border-b border-neutral-100">
-          Privacy &amp; Identity Protections
+          Security &amp; DevSecOps
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {toolsPrivacy.map((tool) => (
@@ -271,7 +271,7 @@ const jsonLd = {
 
       <section id="section-network" data-category-section="network" aria-labelledby="heading-network-tools" class="transition-opacity duration-150">
         <h2 id="heading-network-tools" class="text-base font-semibold text-neutral-500 uppercase tracking-wider mb-5 pb-3 border-b border-neutral-100">
-          Network &amp; Data Architecture
+          Networking &amp; Data
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {toolsNetwork.map((tool) => (
