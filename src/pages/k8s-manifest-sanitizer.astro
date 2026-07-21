@@ -1,0 +1,536 @@
+---
+import Layout from '../layouts/Layout.astro';
+import K8sManifestSanitizer from '../components/tools/K8sManifestSanitizer';
+import RelatedTools from '../components/shared/RelatedTools.astro';
+
+const pageFaqs = [
+  {
+    q: "How does Base64 encoding differ from encryption in Kubernetes?",
+    a: "Base64 is a text encoding scheme, not encryption. It simply transforms binary data into a printable ASCII string so YAML can carry it safely. Anyone with the Base64 string can decode it instantly using 'echo <value> | base64 -d'. Kubernetes Secrets stored as Base64 in etcd are only as secure as the RBAC policies and etcd encryption-at-rest configuration protecting the cluster — the Base64 layer itself provides zero confidentiality."
+  },
+  {
+    q: "How do I convert stringData to data in a Kubernetes Secret manifest?",
+    a: "Kubernetes accepts both fields. Under 'stringData', values are plain-text strings that the API server automatically Base64-encodes before storing. Under 'data', values must already be Base64-encoded. To convert: take each plain-text value from stringData, run 'echo -n \"value\" | base64' (the -n flag omits the trailing newline), and place the result under 'data'. This tool's Encode mode does this automatically for every key in your manifest."
+  },
+  {
+    q: "Is my production secret or API key sent to any server while using this tool?",
+    a: "No. Every operation — Base64 encoding, decoding, and manifest sanitization — runs entirely inside your browser's local JavaScript engine using the native window.btoa() and window.atob() functions. You can verify this by opening your browser DevTools Network tab while using the tool: zero outbound requests will be made. Your secrets never leave your machine."
+  },
+  {
+    q: "What does the Sanitize for Git action actually replace?",
+    a: "The sanitizer targets all values under 'data:' and 'stringData:' keys inside Kubernetes Secret documents. It replaces each raw value (whether Base64-encoded or plain-text) with the placeholder '<REDACTED_SECRET>', preserving the full YAML structure, indentation, and all other fields (metadata, labels, annotations, type). The result is a safe template you can commit to a public or shared repository as a .example.yaml reference."
+  },
+  {
+    q: "Can I use this tool on multi-document YAML files?",
+    a: "Yes. The tool processes manifests separated by the standard YAML document separator '---', sanitizing Secret documents while leaving non-Secret documents (Deployments, ConfigMaps, Services, etc.) completely untouched."
+  },
+  {
+    q: "Why should I never use online converters that process YAML server-side?",
+    a: "Server-side converters receive your raw YAML payload over HTTPS, process it on a backend, and return the result. This means your production database URLs, TLS private keys, API tokens, and service account credentials transit a third-party network and are processed by infrastructure you don't control. Even with TLS in transit, the server operator has full access to your plaintext secrets during processing and in any logs. ConfigDev processes everything in the browser — the server only delivers the static HTML/JS bundle."
+  },
+  {
+    q: "Are Kubernetes Secrets secure by default?",
+    a: "No. By default, Kubernetes stores Secret objects in etcd as plain Base64-encoded data without any additional encryption layer. Anyone with direct etcd access — or sufficient RBAC permissions to read Secrets in the cluster — can retrieve all values. Production clusters should enable etcd encryption at rest using an EncryptionConfiguration, apply strict least-privilege RBAC, and consider using an external secrets manager like HashiCorp Vault or AWS Secrets Manager."
+  },
+  {
+    q: "What is the difference between a Kubernetes Secret and a ConfigMap?",
+    a: "Both store key-value configuration data, but they serve different purposes and carry different access controls. ConfigMaps are designed for non-sensitive configuration like feature flags, environment names, or application settings. Secrets are designed for sensitive data — passwords, tokens, certificates — and benefit from additional access controls, audit logging, and optional encryption at rest. In practice, the key distinction is intent and policy: cluster administrators can restrict Secret access more granularly than ConfigMap access."
+  },
+  {
+    q: "How do I prevent Kubernetes Secrets from appearing in application logs?",
+    a: "Mount Secrets as volume files rather than environment variables, and configure your logging framework to redact known sensitive patterns. Avoid logging request headers or environment dumps in application code. Use structured logging with field-level filtering, and run log outputs through a PII scrubber before shipping to external log aggregators. Never log the full contents of a Secret or any value retrieved from one."
+  },
+  {
+    q: "What is the External Secrets Operator and when should I use it?",
+    a: "The External Secrets Operator (ESO) is a Kubernetes operator that synchronizes secrets from external secret management systems (AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, HashiCorp Vault, 1Password) into native Kubernetes Secrets. Use it when you need centralized secret management, automatic rotation propagation, audit trails, and cross-cluster secret sharing. It removes the need to manually manage Secret manifests while keeping the cluster's native Secret consumption model intact."
+  },
+  {
+    q: "What is the difference between Sealed Secrets and SOPS for GitOps?",
+    a: "Sealed Secrets (Bitnami) encrypts Secret manifests using a public key tied to a specific cluster controller — only that cluster can decrypt them. This works well for single-cluster GitOps but requires key management if the cluster is recreated. SOPS (Mozilla/Getsops) is a more flexible tool that encrypts individual values inside YAML, JSON, or ENV files using KMS keys (AWS, GCP, Azure) or age keys, supporting multi-cluster and multi-environment workflows. Both are appropriate for committing encrypted secrets to Git; the choice depends on your key management preferences."
+  },
+  {
+    q: "Can I decode a Kubernetes Secret without kubectl?",
+    a: "Yes. If you have the raw YAML manifest (e.g., exported from a cluster backup or CI artifact), you can decode the Base64 values using any Base64 decoder — including this tool, the command 'echo -n <value> | base64 -d' on Linux/macOS, or Python's base64 module. This tool's Decode mode processes the full manifest and renders all secret values as readable plain text in one pass, without requiring cluster access."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://configdev.com/k8s-manifest-sanitizer",
+      "url": "https://configdev.com/k8s-manifest-sanitizer",
+      "name": "Kubernetes Secret Encoder Decoder & Manifest Sanitizer - Free & Secure | ConfigDev",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Runs entirely client-side using native browser btoa/atob APIs.",
+      "description": "Free, 100% client-side Kubernetes Secret encoder/decoder and manifest sanitizer. Encode plain-text values to Base64, decode Base64 Secret data blocks, and scrub secrets for safe Git commits — all locally in your browser with zero network ingress.",
+      "offers": { "@type": "Offer", "price": "0.00", "priceCurrency": "USD" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://configdev.com/k8s-manifest-sanitizer/#faq",
+      "mainEntity": pageFaqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://configdev.com/" },
+        { "@type": "ListItem", "position": 2, "name": "K8s Manifest Sanitizer", "item": "https://configdev.com/k8s-manifest-sanitizer" }
+      ]
+    }
+  ]
+};
+---
+
+<Layout
+  title="Kubernetes Secret Encoder/Decoder & Manifest Sanitizer | ConfigDev"
+  description="Free Base64 encoder/decoder for Kubernetes Secrets. Sanitize manifests for Git, convert stringData to data, decode secret values locally. 100% client-side."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+
+  <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    {/* Breadcrumb Navigation */}
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        All Free Developer Tools
+      </a>
+    </nav>
+
+    {/* Header Section Layout */}
+    <header class="mb-8 pb-8 border-b border-neutral-200">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-neutral-900 tracking-tight mb-3">
+            Kubernetes Secret Encoder/Decoder &amp; Manifest Sanitizer
+          </h1>
+          <p class="text-base text-neutral-500 max-w-xl leading-relaxed">
+            Free, zero-ingress tool to encode, decode, and sanitize Kubernetes Secret manifests. Convert Base64 data blocks to readable plain text, encode stringData fields, or scrub secrets for safe Git commits — all processed locally in your browser.
+          </p>
+        </div>
+
+        <div class="shrink-0 inline-flex items-center gap-2 px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-medium text-neutral-600 whitespace-nowrap self-start" role="status">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true"></span>
+          100% Free &amp; Secure Client-Side Sandbox
+        </div>
+      </div>
+    </header>
+
+    {/* Privacy Assurance Matrix & Trust Widgets */}
+    <div class="mb-8 flex flex-col md:flex-row gap-4">
+      {/* Privacy Status Component */}
+      <div class="flex-1 flex items-center justify-center gap-4 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-4 shadow-sm">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          <span class="text-sm font-bold text-emerald-900">Security: 100% Local</span>
+        </div>
+        <div class="w-px h-8 bg-emerald-200"></div>
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          <span class="text-sm font-bold text-emerald-900">Network: 0 Requests</span>
+        </div>
+      </div>
+
+      {/* Transparency: How it Works */}
+      <details class="group bg-neutral-50 border border-neutral-200 rounded-lg flex-1 min-w-[300px]">
+        <summary class="flex items-center justify-between cursor-pointer px-4 py-4 text-sm font-bold text-neutral-800 marker:hidden">
+          <span class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Transparency: How It Works
+          </span>
+          <svg class="w-5 h-5 text-neutral-500 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        </summary>
+        <div class="px-4 pb-4">
+          <pre class="bg-neutral-900 text-emerald-400 p-3 rounded text-xs overflow-x-auto font-mono">
+<code>{`// Native Browser APIs (no external libraries)
+window.btoa(str)  // Encode to Base64
+window.atob(str)  // Decode from Base64
+
+// Regex-based YAML parsing
+/^[ \\t]*data:[ \\t]*\\r?\\n/m  // data: block
+/^[ \\t]*stringData:[ \\t]*\\r?\\n/m  // stringData: block
+/^[ \\t]+([a-zA-Z0-9._-]+):\\s*(.+)$/  // key: value pairs`}</code>
+          </pre>
+        </div>
+      </details>
+    </div>
+
+    {/* Active Functional Workspace Instance */}
+    <div class="mb-4">
+      <K8sManifestSanitizer client:load />
+    </div>
+
+    {/* Trust Validation Vector Banner */}
+    <div class="mb-16 rounded-lg border-2 border-emerald-400 bg-emerald-50 px-5 py-4 text-center shadow-sm">
+      <p class="text-sm sm:text-base font-bold text-emerald-900 tracking-wide">
+        Verifiable Security — Zero Network Overhead · Open DevTools Network Tab to Confirm
+      </p>
+    </div>
+
+    {/* 1. Walkthrough Stack Section */}
+    <section id="how-it-works" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="steps-heading">
+      <h2 id="steps-heading" class="text-lg font-bold text-neutral-900 mb-4">How to Safely Encode, Decode, and Sanitize Kubernetes Secrets</h2>
+      <ol class="space-y-4 list-decimal list-inside text-sm text-neutral-600 leading-relaxed">
+        <li>
+          <strong class="text-neutral-900">Paste Your Kubernetes Secret YAML:</strong> Copy your raw manifest (either with Base64-encoded 'data:' blocks or plain-text 'stringData:' blocks) into the left editor pane, or drag-and-drop your .yaml/.yml file directly.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Select Your Transformation Mode:</strong> Choose Decode to view Base64 values as readable plain text for inspection, Encode to convert stringData into Base64-encoded data format, or Sanitize to replace all secret values with safe <code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded">&lt;REDACTED_SECRET&gt;</code> placeholders.
+        </li>
+        <li>
+          <strong class="text-neutral-900">Copy or Download the Result:</strong> The transformed YAML renders instantly in the right pane. Use the Copy button to grab it for your terminal or kubectl apply, or Download to save it as a .yaml file ready for commit or deployment.
+        </li>
+      </ol>
+    </section>
+
+    {/* 2. Why Never Use Third-Party Converters */}
+    <section id="security-risks" class="max-w-3xl mx-auto mb-16" aria-labelledby="security-heading">
+      <h2 id="security-heading" class="text-lg font-bold text-neutral-900 mb-4">Why You Should Never Paste K8s Manifests into Third-Party Web Converters</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          Most online Base64 encoders and YAML processors operate on a backend server: you submit your data via an HTTP POST, the server processes it, and returns the result. This architectural model creates a fundamental security vulnerability for production Kubernetes infrastructure.
+        </p>
+        <p>
+          When you paste a Kubernetes Secret manifest into a third-party converter, you're transmitting your <strong>database connection strings, API keys, TLS private keys, OAuth client secrets, and service account tokens</strong> over the network to a server you don't control. Even if the connection uses HTTPS, the destination server operator has <strong>full access to your plaintext secrets</strong> during processing. These values may be logged for debugging, cached for performance, or stored in databases for analytics — exposing your infrastructure to breach, compliance violations, and supply-chain attacks.
+        </p>
+        <p>
+          ConfigDev eliminates this attack surface entirely. The encoder/decoder runs 100% in your browser's JavaScript engine using the native <code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded">window.btoa()</code> and <code class="font-mono text-xs bg-neutral-50 px-1 py-0.5 rounded">window.atob()</code> APIs. Your YAML never leaves your device — you can verify this by opening Chrome DevTools Network tab and confirming zero outbound HTTP requests while the tool operates. This is data sovereignty by architecture: the only way to guarantee secrets aren't collected is to never send them in the first place.
+        </p>
+      </div>
+    </section>
+
+    {/* 3. Comparison Table */}
+    <section id="comparison-table" class="max-w-3xl mx-auto mb-16" aria-labelledby="comparison-heading">
+      <h2 id="comparison-heading" class="text-lg font-bold text-neutral-900 mb-4">Comparison: Native kubectl CLI vs. Web-Based Sanitization</h2>
+      <div class="overflow-x-auto border border-neutral-200 rounded-xl">
+        <table class="w-full text-left text-xs text-neutral-700 bg-white">
+          <thead class="bg-neutral-50 text-neutral-500 uppercase text-[10px] tracking-wider border-b border-neutral-200">
+            <tr>
+              <th class="px-4 py-3 font-bold">Method</th>
+              <th class="px-4 py-3 font-bold">Speed</th>
+              <th class="px-4 py-3 font-bold">Security Risk</th>
+              <th class="px-4 py-3 font-bold">Batch Handling</th>
+              <th class="px-4 py-3 font-bold">Git Hygiene</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-neutral-200 font-mono">
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-neutral-900">echo | base64</td>
+              <td class="px-4 py-2.5 text-amber-600">Fast (CLI)</td>
+              <td class="px-4 py-2.5 text-emerald-600">Zero (local)</td>
+              <td class="px-4 py-2.5 text-neutral-500">Manual loops</td>
+              <td class="px-4 py-2.5 text-neutral-500">Manual scrub</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-neutral-900">kubectl create secret</td>
+              <td class="px-4 py-2.5 text-amber-600">Fast (CLI)</td>
+              <td class="px-4 py-2.5 text-emerald-600">Zero (local)</td>
+              <td class="px-4 py-2.5 text-neutral-500">One-by-one</td>
+              <td class="px-4 py-2.5 text-rose-600">Not supported</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-neutral-900">ConfigDev Sanitizer</td>
+              <td class="px-4 py-2.5 text-emerald-600">Instant (browser)</td>
+              <td class="px-4 py-2.5 text-emerald-600">Zero (local)</td>
+              <td class="px-4 py-2.5 text-emerald-600">Multi-doc YAML</td>
+              <td class="px-4 py-2.5 text-emerald-600">One-click sanitize</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2.5 font-bold text-neutral-900">Third-party converter</td>
+              <td class="px-4 py-2.5 text-emerald-600">Instant (web)</td>
+              <td class="px-4 py-2.5 text-rose-600">High (server-side)</td>
+              <td class="px-4 py-2.5 text-amber-600">Varies</td>
+              <td class="px-4 py-2.5 text-neutral-500">Manual scrub</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {/* 4. Before/After Example */}
+    <section id="before-after-example" class="max-w-3xl mx-auto mb-16" aria-labelledby="example-heading">
+      <h2 id="example-heading" class="text-xs font-bold uppercase tracking-wider text-neutral-400 font-mono mb-4">Before/After: Sanitize for Git Example</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-50 border border-neutral-200 rounded-xl p-5 font-mono text-xs text-neutral-700">
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Original Production Secret</div>
+          <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto">{`apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: UEBzc3cwcmQxMjMh
+  database-url: cG9zdGdyZXNxbDovL2FkbWluOlBAc3N3MHJkMTIzIUBkYi5leGFtcGxlLmNvbTo1NDMyL215ZGI=`}</pre>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase font-bold text-neutral-400 mb-2 tracking-wider">Sanitized Template (Safe for Git)</div>
+          <pre class="bg-neutral-900 text-neutral-100 p-3 rounded-lg overflow-x-auto">{`apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: <REDACTED_SECRET>
+  password: <REDACTED_SECRET>
+  database-url: <REDACTED_SECRET>`}</pre>
+        </div>
+      </div>
+    </section>
+
+    {/* 5. Kubernetes Secret Types Reference */}
+    <section id="secret-types" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 mb-16" aria-labelledby="secret-types-heading">
+      <h2 id="secret-types-heading" class="text-lg font-bold text-neutral-900 mb-2">Kubernetes Secret Types: A Complete Reference</h2>
+      <p class="text-sm text-neutral-600 mb-6 leading-relaxed">
+        Kubernetes defines several built-in Secret types via the <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">type:</code> field. Each type enforces different data key constraints and is consumed differently by the kubelet or admission controllers.
+      </p>
+      <div class="overflow-x-auto border border-neutral-200 rounded-xl mb-6">
+        <table class="w-full text-left text-xs text-neutral-700 bg-white">
+          <thead class="bg-neutral-50 text-neutral-500 uppercase text-[10px] tracking-wider border-b border-neutral-200">
+            <tr>
+              <th class="px-4 py-3 font-bold">type: value</th>
+              <th class="px-4 py-3 font-bold">Use Case</th>
+              <th class="px-4 py-3 font-bold">Required Keys</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-neutral-200 font-mono">
+            <tr><td class="px-4 py-2.5 text-neutral-900">Opaque</td><td class="px-4 py-2.5 font-sans text-neutral-600">Arbitrary user-defined secrets</td><td class="px-4 py-2.5 text-neutral-500">None</td></tr>
+            <tr><td class="px-4 py-2.5 text-neutral-900">kubernetes.io/service-account-token</td><td class="px-4 py-2.5 font-sans text-neutral-600">Service account JWT tokens</td><td class="px-4 py-2.5 text-neutral-500">token, ca.crt, namespace</td></tr>
+            <tr><td class="px-4 py-2.5 text-neutral-900">kubernetes.io/dockerconfigjson</td><td class="px-4 py-2.5 font-sans text-neutral-600">Docker registry pull credentials</td><td class="px-4 py-2.5 text-neutral-500">.dockerconfigjson</td></tr>
+            <tr><td class="px-4 py-2.5 text-neutral-900">kubernetes.io/basic-auth</td><td class="px-4 py-2.5 font-sans text-neutral-600">HTTP Basic authentication</td><td class="px-4 py-2.5 text-neutral-500">username, password</td></tr>
+            <tr><td class="px-4 py-2.5 text-neutral-900">kubernetes.io/ssh-auth</td><td class="px-4 py-2.5 font-sans text-neutral-600">SSH private key credentials</td><td class="px-4 py-2.5 text-neutral-500">ssh-privatekey</td></tr>
+            <tr><td class="px-4 py-2.5 text-neutral-900">kubernetes.io/tls</td><td class="px-4 py-2.5 font-sans text-neutral-600">TLS certificates and private keys</td><td class="px-4 py-2.5 text-neutral-500">tls.crt, tls.key</td></tr>
+            <tr><td class="px-4 py-2.5 text-neutral-900">bootstrap.kubernetes.io/token</td><td class="px-4 py-2.5 font-sans text-neutral-600">Node bootstrap tokens</td><td class="px-4 py-2.5 text-neutral-500">token-id, token-secret</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm text-neutral-600 leading-relaxed">
+        This sanitizer handles all types uniformly — it targets the <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">data:</code> and <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">stringData:</code> blocks regardless of the <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">type:</code> value, so TLS Secrets, Docker registry credentials, and Opaque application secrets are all processed correctly.
+      </p>
+    </section>
+
+    {/* 6. Secrets in CI/CD Pipelines */}
+    <section id="cicd-workflow" class="max-w-3xl mx-auto mb-16" aria-labelledby="cicd-heading">
+      <h2 id="cicd-heading" class="text-lg font-bold text-neutral-900 mb-4">Managing Kubernetes Secrets Safely in CI/CD Pipelines</h2>
+      <div class="text-sm text-neutral-600 space-y-4 leading-relaxed">
+        <p>
+          One of the most common sources of secret leakage in Kubernetes deployments is the CI/CD pipeline itself. Teams frequently commit Secret manifests directly to Git repositories — either accidentally or because they lack a reliable sanitization step — where they persist in version history indefinitely, even after the values rotate.
+        </p>
+        <p>
+          A practical GitOps workflow for handling Secrets safely has three stages:
+        </p>
+      </div>
+      <div class="mt-6 space-y-4">
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-sm font-bold text-neutral-900 mb-1">Stage 1 — Sanitized Templates in Git</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            Commit only a <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">secret.example.yaml</code> file with all values replaced by <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">&lt;REDACTED_SECRET&gt;</code>. This gives your team a structural reference without exposing live credentials. Use this tool's Sanitize mode to generate that file in one click.
+          </p>
+        </div>
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-sm font-bold text-neutral-900 mb-1">Stage 2 — Secret Injection at Deploy Time</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            Inject real values at runtime from a trusted secrets manager — AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager, or Azure Key Vault — using a Kubernetes operator like the <strong>External Secrets Operator (ESO)</strong> or <strong>Vault Agent Injector</strong>. These tools sync secrets from your vault into Kubernetes Secrets automatically, with rotation support and audit trails.
+          </p>
+        </div>
+        <div class="border-l-2 border-neutral-200 pl-4">
+          <h3 class="text-sm font-bold text-neutral-900 mb-1">Stage 3 — Seal Secrets for GitOps Workflows</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed">
+            If you need actual encrypted secrets in Git (for fully declarative ArgoCD or Flux deployments), use <strong>Bitnami Sealed Secrets</strong> or <strong>SOPS (Secrets OPerationS)</strong>. These tools encrypt secret values with a cluster-specific key so only your cluster can decrypt them — the ciphertext is safe to commit.
+          </p>
+        </div>
+      </div>
+      <div class="mt-6 bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+        <h3 class="text-xs font-bold text-neutral-900 mb-2 uppercase font-mono tracking-wide">Quick CLI Reference: Common Secret Operations</h3>
+        <pre class="bg-neutral-900 text-neutral-100 p-3 rounded text-[11px] overflow-x-auto font-mono leading-relaxed">{`# Create a generic Opaque secret from literal values
+kubectl create secret generic db-creds \\
+  --from-literal=username=admin \\
+  --from-literal=password='P@ssw0rd123!'
+
+# Decode a specific key from an existing secret
+kubectl get secret db-creds -o jsonpath='{.data.password}' | base64 -d
+
+# Export and sanitize an existing secret for documentation
+kubectl get secret db-creds -o yaml | \\
+  sed 's/: .*/: <REDACTED_SECRET>/g' > secret.example.yaml
+
+# Apply a secret manifest
+kubectl apply -f secret.yaml --namespace=production`}</pre>
+      </div>
+    </section>
+
+    {/* 7. Kubernetes Secret Security Hardening */}
+    <section id="security-hardening" class="max-w-3xl mx-auto mb-16" aria-labelledby="hardening-heading">
+      <h2 id="hardening-heading" class="text-lg font-bold text-neutral-900 mb-4">Kubernetes Secret Security Hardening Best Practices</h2>
+      <div class="text-sm text-neutral-600 space-y-6 leading-relaxed">
+        <p>
+          Base64 encoding is not a security mechanism. Kubernetes Secrets are stored unencrypted in etcd by default, which means anyone with direct etcd access or broad RBAC permissions can read every secret in the cluster. The following hardening layers are essential for any production deployment.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Enable etcd Encryption at Rest</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed">
+              Configure the Kubernetes API server with an <code class="font-mono bg-neutral-100 px-0.5 rounded">EncryptionConfiguration</code> manifest using AES-CBC or AES-GCM providers. This encrypts Secret objects before they are written to etcd, preventing raw reads from etcd backups or direct disk access.
+            </p>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Apply Least-Privilege RBAC</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed">
+              Restrict <code class="font-mono bg-neutral-100 px-0.5 rounded">get</code>, <code class="font-mono bg-neutral-100 px-0.5 rounded">list</code>, and <code class="font-mono bg-neutral-100 px-0.5 rounded">watch</code> verbs on Secret resources to only the service accounts and users that explicitly require them. Avoid cluster-wide wildcard bindings. Audit with <code class="font-mono bg-neutral-100 px-0.5 rounded">kubectl auth can-i --list</code>.
+            </p>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Mount Secrets as Files, Not Env Vars</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed">
+              Environment variables are exposed to all child processes and appear in <code class="font-mono bg-neutral-100 px-0.5 rounded">/proc/&lt;pid&gt;/environ</code>. Mounting secrets as volume files and reading them at runtime reduces the attack surface and prevents accidental leaks through debug dumps or logging frameworks.
+            </p>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Rotate Secrets Regularly</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed">
+              Treat all Kubernetes Secrets as potentially compromised after any security incident, cluster credential rotation, or team member departure. Automate rotation using your external secrets manager's rotation policy and the External Secrets Operator to propagate updates to the cluster automatically.
+            </p>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Enable Audit Logging on Secrets</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed">
+              Configure Kubernetes audit policy to log all <code class="font-mono bg-neutral-100 px-0.5 rounded">get</code> and <code class="font-mono bg-neutral-100 px-0.5 rounded">list</code> requests on Secret resources at the <code class="font-mono bg-neutral-100 px-0.5 rounded">RequestResponse</code> level. Forward audit logs to a SIEM for anomaly detection on unusual secret access patterns.
+            </p>
+          </div>
+          <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Use an External Secrets Operator</h3>
+            <p class="text-xs text-neutral-500 leading-relaxed">
+              Tools like the <strong>External Secrets Operator</strong> sync secrets from AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager, and Azure Key Vault into Kubernetes Secrets. This keeps the source of truth outside the cluster and enables centralized rotation, versioning, and access auditing.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* 8. Decode Base64 Manually - Programmatic Reference */}
+    <section id="programmatic-reference" class="max-w-3xl mx-auto mb-16 border-t border-neutral-200 pt-12" aria-labelledby="programmatic-heading">
+      <h2 id="programmatic-heading" class="text-lg font-bold text-neutral-900 mb-4">Programmatic Base64 Encode/Decode for Kubernetes Secrets</h2>
+      <p class="text-sm text-neutral-600 mb-6 leading-relaxed">
+        If you need to automate encoding or decoding at scale — in shell scripts, Helm chart pipelines, or CI jobs — these are the idiomatic commands across common environments.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+          <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Linux / macOS Shell</h3>
+          <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto font-mono">{`# Encode (the -n flag suppresses newline)
+echo -n "my-secret-value" | base64
+
+# Decode
+echo -n "bXktc2VjcmV0LXZhbHVl" | base64 -d
+
+# Decode directly from a live secret
+kubectl get secret my-secret \\
+  -o jsonpath='{.data.password}' | base64 -d`}</pre>
+        </div>
+        <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+          <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">PowerShell (Windows)</h3>
+          <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto font-mono">{`# Encode
+[Convert]::ToBase64String(
+  [System.Text.Encoding]::UTF8.GetBytes(
+    "my-secret-value"))
+
+# Decode
+[System.Text.Encoding]::UTF8.GetString(
+  [Convert]::FromBase64String(
+    "bXktc2VjcmV0LXZhbHVl"))`}</pre>
+        </div>
+        <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+          <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Python</h3>
+          <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto font-mono">{`import base64
+
+# Encode
+encoded = base64.b64encode(
+  b"my-secret-value").decode("utf-8")
+
+# Decode
+decoded = base64.b64decode(
+  "bXktc2VjcmV0LXZhbHVl").decode("utf-8")`}</pre>
+        </div>
+        <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+          <h3 class="font-bold text-neutral-900 mb-2 text-xs uppercase font-mono tracking-wide">Go</h3>
+          <pre class="bg-neutral-900 text-neutral-100 p-2.5 rounded text-[10px] overflow-x-auto font-mono">{`import "encoding/base64"
+
+// Encode
+enc := base64.StdEncoding.EncodeToString(
+  []byte("my-secret-value"))
+
+// Decode
+dec, err := base64.StdEncoding.DecodeString(
+  "bXktc2VjcmV0LXZhbHVl")`}</pre>
+        </div>
+      </div>
+    </section>
+
+    {/* 9. Common Mistakes Section */}
+    <section id="common-mistakes" class="max-w-3xl mx-auto mb-16" aria-labelledby="mistakes-heading">
+      <h2 id="mistakes-heading" class="text-lg font-bold text-neutral-900 mb-6">Common Kubernetes Secret Mistakes (and How to Fix Them)</h2>
+      <div class="space-y-6">
+        <div class="border-l-2 border-rose-200 pl-4">
+          <h3 class="text-sm font-bold text-neutral-900 mb-1">Mistake 1: Encoding with a trailing newline</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed mb-2">
+            Running <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">echo "value" | base64</code> (without <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">-n</code>) encodes the newline character too, producing a different Base64 string. When Kubernetes decodes it, your application receives the value with a trailing <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">\n</code>, which breaks connection string parsers and authentication headers silently.
+          </p>
+          <p class="text-xs text-emerald-700 font-semibold">Fix: Always use <code class="font-mono bg-emerald-50 px-1 rounded">echo -n</code> or this browser tool, which handles the encoding correctly without adding newlines.</p>
+        </div>
+        <div class="border-l-2 border-rose-200 pl-4">
+          <h3 class="text-sm font-bold text-neutral-900 mb-1">Mistake 2: Committing live Secret manifests to Git</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed mb-2">
+            Even a single commit of a live Secret file persists in Git history permanently. Rotating the secret value does not remove it — anyone who clones the repository can check out that commit and recover the original value. This is a critical compliance violation under SOC 2, PCI-DSS, and HIPAA.
+          </p>
+          <p class="text-xs text-emerald-700 font-semibold">Fix: Use the Sanitize mode here to generate a <code class="font-mono bg-emerald-50 px-1 rounded">secret.example.yaml</code> for Git, and add <code class="font-mono bg-emerald-50 px-1 rounded">*secret*.yaml</code> to your <code class="font-mono bg-emerald-50 px-1 rounded">.gitignore</code>.</p>
+        </div>
+        <div class="border-l-2 border-rose-200 pl-4">
+          <h3 class="text-sm font-bold text-neutral-900 mb-1">Mistake 3: Using the default Opaque type for TLS certificates</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed mb-2">
+            TLS certificates stored as <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">Opaque</code> Secrets with arbitrary key names won't be recognized by Ingress controllers or cert-manager, which expect the standard <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">kubernetes.io/tls</code> type with keys <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">tls.crt</code> and <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">tls.key</code>.
+          </p>
+          <p class="text-xs text-emerald-700 font-semibold">Fix: Set <code class="font-mono bg-emerald-50 px-1 rounded">type: kubernetes.io/tls</code> and use the standard key names so Ingress and cert-manager can consume the Secret correctly.</p>
+        </div>
+        <div class="border-l-2 border-rose-200 pl-4">
+          <h3 class="text-sm font-bold text-neutral-900 mb-1">Mistake 4: Mixing stringData and data in the same manifest</h3>
+          <p class="text-sm text-neutral-600 leading-relaxed mb-2">
+            While Kubernetes allows both <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">stringData</code> and <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">data</code> in the same Secret, if the same key appears in both blocks, <code class="font-mono text-xs bg-neutral-100 px-1 py-0.5 rounded">stringData</code> takes precedence. This creates confusing precedence bugs that are hard to debug in multi-team environments.
+          </p>
+          <p class="text-xs text-emerald-700 font-semibold">Fix: Use the Encode mode here to convert all <code class="font-mono bg-emerald-50 px-1 rounded">stringData</code> fields to Base64 <code class="font-mono bg-emerald-50 px-1 rounded">data</code> fields, keeping your manifest consistent.</p>
+        </div>
+      </div>
+    </section>
+
+    {/* Technical FAQ List Module */}
+    <section id="tool-faq" class="max-w-3xl mx-auto border-t border-neutral-200 pt-12 pb-12" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" class="text-2xl font-bold text-neutral-900 mb-8">Frequently Asked Questions</h2>
+      
+      <div class="space-y-6">
+        {pageFaqs.map((faq) => (
+          <div>
+            <h4 class="font-bold text-neutral-800 mb-1.5 text-sm">{faq.q}</h4>
+            <p class="text-xs text-neutral-500 leading-relaxed text-justify">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <RelatedTools tools={[
+      { href: '/pii-masker-log-scrubber', title: 'PII Masker & Log Scrubber', description: 'Redact emails, secrets, tokens, and IPs from raw system dumps and server logs locally.', icon: 'M12 15v2m0 0v3m0-3h3m-3 0H9m12-3a9 9 0 11-18 0 9 9 0 0118 0zM12 5V3m0 2L9 3m3 2l3-3' },
+      { href: '/env-to-json', title: 'Env to JSON Converter', description: 'Parse standard .env files into clean, structured JSON objects ready for any pipeline.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
+      { href: '/json-to-env', title: 'JSON to Env Converter', description: 'Flatten nested JSON objects into standard flat .env key-value lines with configurable delimiters.', icon: 'M6 16l-4-4 4-4M18 8l4 4-4 4' },
+    ]} />
+
+  </main>
+</Layout>

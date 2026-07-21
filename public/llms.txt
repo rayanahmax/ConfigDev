@@ -10,6 +10,7 @@ ConfigDev is a high-performance web utility suite designed for systems administr
 - [Env to JSON Converter](https://configdev.com/env-to-json): Parse standard key-value `.env` files into clean structured JSON configuration objects with type-casting.
 - [JSON to Env Converter](https://configdev.com/json-to-env): Flatten nested JSON objects into standard flat `.env` key-value lines with custom delimiters.
 - [PII Masker & Log Scrubber](https://configdev.com/pii-masker-log-scrubber): Redact emails, secrets, tokens, and IP strings out of raw log dumps locally.
+- [Kubernetes Secret Encoder/Decoder & Manifest Sanitizer](https://configdev.com/k8s-manifest-sanitizer): Base64 encode/decode Kubernetes Secret data blocks and sanitize manifests for safe Git commits — 100% client-side using native btoa/atob.
 - [CIDR Subnet Calculator](https://configdev.com/cidr-subnet-calculator): Compute subnet boundaries, usable host ranges, broadcast addresses, and masks for IPv4.
 - [CSV to JSON Schema Builder](https://configdev.com/csv-to-json-schema): Inspect CSV columns and auto-infer valid JSON Schema Draft-07 specification files.
 
